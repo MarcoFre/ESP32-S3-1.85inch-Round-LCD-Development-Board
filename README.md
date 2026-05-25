@@ -21,7 +21,7 @@ Un satellite vocale per **Home Assistant** basato su **ESPHome**, con display ro
 |---|---|
 | **Prodotto** | Waveshare ESP32-S3 Touch LCD 1.85C / 1.85C-BOX |
 | **Link Amazon** | [Waveshare ESP32-S3 Touch LCD 1.85C / 1.85C-BOX](https://amzn.to/4dHuK3w) |
-| **Pagina prodotto Waveshare** | [Waveshare ESP32-S3 Touch LCD 1.85C / 1.85C-BOX](https://www.waveshare.com/esp32-s3-touch-lcd-1.85c.htm?sku=30684&aff_id=HackMyHome)) |
+| **Pagina prodotto Waveshare** | [Waveshare ESP32-S3 Touch LCD 1.85C / 1.85C-BOX](https://www.waveshare.com/esp32-s3-touch-lcd-1.85c.htm?sku=30684&aff_id=HackMyHome) |
 | **Documentazione ufficiale** | [Waveshare Wiki](https://docs.waveshare.com/ESP32-S3-Touch-LCD-1.85C) |
 | **Firmware base** | ESPHome |
 | **Integrazione domotica** | Home Assistant Voice Assistant |
