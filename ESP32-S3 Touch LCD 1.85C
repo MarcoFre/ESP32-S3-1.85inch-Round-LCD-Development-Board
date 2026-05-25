@@ -1,0 +1,4336 @@
+# ======================================================
+# Waveshare ESP32-S3 Touch LCD 1.85C
+# HackMyHome
+# ======================================================
+
+substitutions:
+  device_name: home-assistant-voice-speaker-02
+  friendly:   "Speaker-04"
+  fw_version: "1.0.0"
+
+  # -------- SECURITY --------
+  password:   "aaaaaaaaaaaaafffffffffffff"
+  api_key:    "CiNgQqOfbti7EO2MJWx+lGptEgBe9O2YHfdgdts26U4="
+  ota_key:    "777947954e176a894bb4402f586e789c"
+
+  # -------- WiFi --------
+  ip:           "192.168.31.152"
+  gateway:      "192.168.31.1"
+  subnet:       "255.255.255.0"
+  dns:          "192.168.1.1"
+  ssid:         "internet_r"
+  hidden_ssid:  "false"
+
+  substitutions:
+  ble_sync_uuid: "7f4c8f1e-4f22-4d8f-9d8b-6c7a9f1a2026"
+  ble_sync_major: "2026"
+  my_ble_minor: "2"
+  ble_peer_minor: "1"
+
+  # -------- Voice Assistant Phases --------
+  voice_assist_idle_phase_id:                   '1' # ready to be triggered by a wake word
+  voice_assist_waiting_for_command_phase_id:    '2' # waiting for a voice command after wake word
+  voice_assist_listening_for_command_phase_id:  '3' # actively listening to user speech
+  voice_assist_thinking_phase_id:               '4' # processing the command
+  voice_assist_replying_phase_id:               '5' # replying to the command
+  voice_assist_not_ready_phase_id:             '10' # not ready
+  voice_assist_error_phase_id:                 '11' # encountered an error
+
+  # -------- Display Waveshare ESP32-S3 Touch LCD 1.85C - ST77916 QSPI --------
+  display_clk_pin: GPIO40
+  display_qspi_d0: GPIO46
+  display_qspi_d1: GPIO45
+  display_qspi_d2: GPIO42
+  display_qspi_d3: GPIO41
+  display_cs_pin:  GPIO21
+  display_bl_pin:  GPIO5
+  display_reset_expander_pin: "1"
+
+  # -------- Touch CST816T --------
+  touch_interrupt_pin: GPIO4
+  touch_address: "0x15"
+  touch_reset_expander_pin: "0"
+
+  # -------- Audio / I2S pins - Waveshare ESP32-S3 Touch LCD 1.85C --------
+  i2c_scl:          GPIO10
+  i2c_sda:          GPIO11
+  i2s_mclk:         GPIO2
+  i2s_bclk:         GPIO48
+  i2s_lrclk:        GPIO38
+  i2s_dout:         GPIO47
+  i2s_din:          GPIO39
+
+  # ---------------- BATTERY ADC ----------------
+  battery_adc_pin: GPIO8
+
+  # -------- Codec --------
+  es8311_address:   "0x18"
+  es7210_address:   "0x40"
+
+  # -------- Amplifier --------
+  amp_ctrl:         GPIO15
+
+  # -------- Microphone channel lookup --------
+  mic_channel_0: 'left'
+  mic_channel_1: 'right'
+  mic_channel_2: 'stereo'
+
+  # -------- Audio tuning --------
+  which_mic:            0          # 0=left, 1=right, 2=stereo
+  i2s_sample_rate:      16000
+  i2s_bits_per_sample:  32
+  i2s_mode_mic:         primary
+  i2s_mode_speaker:     secondary
+  i2s_use_apll:         true
+  i2s_bps_spk:          16bit
+  i2s_bps_mic:          16bit
+  i2s_mclk_multiple:  256
+
+  # ======================================================
+  # ENTITY / COMPONENT IDS
+  # ======================================================
+  # -------- Core IDs --------
+  wifi_component_id:  wifi_id
+  api_component_id:   api_id
+  ota_component_id:   ota_esphome
+  rtc_id: rtc
+
+  # -------- I2C / Expander --------
+  i2c_bus_id:     internal_i2c
+  io_expander_id: ioexp
+
+  # -------- Display / Touch --------
+  display_id:                   oled
+  display_backlight_output_id:  display_backlight_output
+  display_backlight_id:         display_backlight
+  touch_panel_id:               touch_panel
+
+  # -------- Audio / Voice Assistant --------
+  media_player_id:    external_media_player
+  voice_assistant_id: va
+  micro_wake_word_id: mww
+  audio_adc_id:       adc_mic
+  va_microphone_id:   va_mic
+
+  # -------- Speaker / Mixer / Resampler IDs --------
+  hw_speaker_id: hw_speaker
+  media_mixer_input_id: media_mixer_input
+  announcement_mixer_input_id: announcement_mixer_input
+
+  # -------- Switch IDs --------
+  mic_mute_switch_id:       mic_mute_switch
+  wake_sound_switch_id:     wake_sound
+  timer_ringing_switch_id:  timer_ringing
+  antifurto_switch_id:      sw_antifurto
+  alarm_on_switch_id:       alarm_on
+
+  # -------- Number / Select / Text IDs --------
+  mic_gain_number_id:             mic_gain_db
+  va_gain_factor_number_id:       va_gain_factor
+  va_noise_suppression_number_id: va_noise_suppression
+  alarm_time_text_id:             alarm_time
+  current_time_text_id:           current_time
+  alarm_action_select_id:         alarm_action
+
+  # -------- Sensor / Text Sensor IDs --------
+  next_timer_sensor_id:       next_timer
+  next_timer_name_sensor_id:  next_timer_name
+
+  # -------- Audio File IDs --------
+  mute_switch_on_sound_id:        mute_switch_on_sound
+  mute_switch_off_sound_id:       mute_switch_off_sound
+  timer_finished_sound_id:        timer_finished_sound
+  wake_word_triggered_sound_id:   wake_word_triggered_sound
+
+  # -------- Global IDs --------
+  touch_x_id: touch_x
+  touch_y_id: touch_y
+  touch_counter_id: touch_counter
+  local_cmd_code_id: local_cmd_code
+
+  display_startled_until_id: display_startled_until
+  display_awake_until_id: display_awake_until
+  display_emotion_mode_id: display_emotion_mode
+  volume_bar_until_id: volume_bar_until
+
+  antifurto_alarm_in_corso_id: antifurto_alarm_in_corso
+  wake_word_flow_active_id: wake_word_flow_active
+
+  va_timer_total_seconds_id: va_timer_total_seconds
+  va_timer_seconds_left_id: va_timer_seconds_left
+  va_timer_last_tick_ms_id: va_timer_last_tick_ms
+  va_timer_active_display_id: va_timer_active_display
+  va_timer_name_display_id: va_timer_name_display
+
+  mic_gain_saved_id: mic_gain_saved
+
+  led_ring_color_r_id: led_ring_color_r
+  led_ring_color_g_id: led_ring_color_g
+  led_ring_color_b_id: led_ring_color_b
+
+  init_in_progress_id: init_in_progress
+  improv_ble_in_progress_id: improv_ble_in_progress
+
+  voice_assistant_phase_global_id: voice_assistant_phase
+  voice_assistant_phase_prev_id: voice_assistant_phase_prev
+
+  saved_alarm_time_id: saved_alarm_time
+  saved_time_zone_id: saved_time_zone
+  saved_alarm_action_id: saved_alarm_action
+
+  first_active_timer_id: first_active_timer
+  is_timer_active_id: is_timer_active
+
+  fw_update_check_enabled_id: fw_update_check_enabled
+  fw_update_available_id: fw_update_available
+  fw_latest_version_id: fw_latest_version
+
+  va_modalita_continua_id: va_modalita_continua
+  va_ultimo_input_ms_id: va_ultimo_input_ms
+
+  # -------- Script IDs --------
+  script_va_local_volume_up_id: va_local_volume_up
+  script_va_local_volume_down_id: va_local_volume_down
+  script_va_local_mute_on_id: va_local_mute_on
+  script_va_local_mute_off_id: va_local_mute_off
+  script_va_local_silent_on_id: va_local_silent_on
+  script_va_stop_id: va_stop
+  script_va_local_alarm_on_id: va_local_alarm_on
+  script_va_local_alarm_off_id: va_local_alarm_off
+  script_start_va_from_wake_word_id: start_va_from_wake_word
+  script_ensure_wake_word_running_id: ensure_wake_word_running
+  script_ring_timer_id: ring_timer
+  script_enable_repeat_one_id: enable_repeat_one
+  script_disable_repeat_id: disable_repeat
+  script_play_sound_id: play_sound
+  script_fetch_first_active_timer_id: fetch_first_active_timer
+  script_check_if_timers_active_id: check_if_timers_active
+  script_activate_stop_word_once_id: activate_stop_word_once
+  script_check_alarm_id: check_alarm
+  script_send_alarm_event_id: send_alarm_event
+  script_send_tts_uri_event_id: send_tts_uri_event
+  script_send_stt_text_event_id: send_stt_text_event
+  script_publish_current_time_id: publish_current_time
+  script_check_firmware_version_id: check_firmware_version
+  script_flash_ring_id: flash_ring
+  script_antifurto_trigger_id: antifurto_trigger
+  script_control_brightness_apply_id: control_brightness_apply
+  script_control_start_va_id: control_start_va
+
+  # -------- Additional Component / Entity IDs --------
+  display_qspi_id: display_qspi
+  i2s_output_id: i2s_output
+  i2s_input_id: i2s_input
+  audio_dac_id: es8311_dac
+  microphone_id: i2s_mics
+  i2s_audio_speaker_id: i2s_audio_speaker
+  audio_mixer_speaker_id: audio_mixer_speaker
+  media_resampler_id: media_resampler
+  announcement_resampler_id: announcement_resampler
+  amp_enable_switch_id: amp_enable_8
+  mute_sound_switch_id: mute_sound
+  va_continuous_mode_switch_id: sw_modalita_va_continua
+  fw_update_check_switch_id: sw_fw_update_check
+  noise_threshold_number_id: noise_threshold_db
+  ambient_noise_sensor_id: ambient_noise_db
+  playback_meter_sensor_id: playback_meter
+  playback_rms_sensor_id: playback_rms
+  playback_peak_sensor_id: playback_peak
+  noise_detected_binary_sensor_id: noise_detected
+  emotion_select_id: emotion_select
+  logger_select_id: logger_select
+  factory_reset_button_id: factory_reset_button
+  restart_button_id: restart_button
+  font_header_id: font_header
+  font_timer_big_id: font_timer_big
+  font_timer_small_id: font_timer_small
+  wake_word_okay_nabu_model_id: okay_nabu
+  wake_word_kenobi_model_id: kenobi
+  wake_word_hey_jarvis_model_id: hey_jarvis
+  wake_word_stop_model_id: stop
+
+ # -------- Local Intent --------
+  up:               "alza"
+  increase:         "aumenta"
+  down:             "abbassa"
+  reduce:           "riduci"
+  volume:           "volume"
+
+  enable:           "attiva"
+  disable:          "disattiva"
+  put:              "metti"
+  remove:           "togli"
+  allow:            "abilita"
+  deny:             "disabilita"
+
+  silent_mode:      "modalita silenziosa"
+  silent_mode_acc:  "modalità silenziosa"
+
+  arm:              "inserisci"
+  disarm:           "disinserisci"
+  alarm:            "antifurto"
+
+globals:
+  - id: companion_ble_last_rssi
+    type: float
+    restore_value: no
+    initial_value: '-100.0'
+
+  - id: companion_ble_last_seen_ms
+    type: uint32_t
+    restore_value: no
+    initial_value: '0'
+
+  - id: companion_ble_seen_once
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  # ======================================================
+  # TOUCH CONTROL PAGE
+  # ======================================================
+  - id: control_page_active
+    type: bool
+    restore_value: no
+    initial_value: "false"
+
+  - id: control_page_until
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: control_touch_start_x
+    type: int
+    restore_value: no
+    initial_value: "180"
+
+  - id: control_touch_start_y
+    type: int
+    restore_value: no
+    initial_value: "180"
+
+  - id: control_touch_start_ms
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: control_last_touch_ms
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: control_touch_cooldown_until
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: control_action_code
+    type: int
+    restore_value: no
+    initial_value: "0"
+
+  - id: ui_media_muted
+    type: bool
+    restore_value: no
+    initial_value: "false"
+
+  - id: ui_brightness_level
+    type: float
+    restore_value: yes
+    initial_value: "0.80"
+
+  - id: touch_ui_freeze_until
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: touch_volume_drag_active
+    type: bool
+    restore_value: no
+    initial_value: "false"
+
+  - id: touch_volume_last_redraw_ms
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: touch_volume_slider_until
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: touch_volume_last_set_ms
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: ${touch_x_id}
+    type: int
+    restore_value: no
+    initial_value: "180"
+
+  - id: ${touch_y_id}
+    type: int
+    restore_value: no
+    initial_value: "180"
+
+  - id: ${touch_counter_id}
+    type: int
+    restore_value: no
+    initial_value: "0"
+
+  - id: ${local_cmd_code_id}
+    type: int
+    restore_value: no
+    initial_value: "0"
+
+  - id: ${display_startled_until_id}
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: ${antifurto_alarm_in_corso_id}
+    type: bool
+    restore_value: no
+    initial_value: "false"
+
+  - id: ${wake_word_flow_active_id}
+    type: bool
+    restore_value: no
+    initial_value: "false"
+
+  - id: ${volume_bar_until_id}
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: ${display_emotion_mode_id}
+    type: int
+    restore_value: yes
+    initial_value: "0"
+
+  - id: ${display_awake_until_id}
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: ${va_timer_total_seconds_id}
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: ${va_timer_seconds_left_id}
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: ${va_timer_last_tick_ms_id}
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+  - id: ${va_timer_active_display_id}
+    type: bool
+    restore_value: no
+    initial_value: "false"
+
+  - id: ${va_timer_name_display_id}
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+
+  - id: ${mic_gain_saved_id}
+    type: float
+    restore_value: yes
+    initial_value: '32.0'
+
+  - id: ${led_ring_color_r_id}
+    type: float
+    restore_value: yes
+    initial_value: '1.0'
+
+  - id: ${led_ring_color_g_id}
+    type: float
+    restore_value: yes
+    initial_value: '0.0'
+
+  - id: ${led_ring_color_b_id}
+    type: float
+    restore_value: yes
+    initial_value: '1.0'
+
+  - id: ${init_in_progress_id}
+    type: bool
+    restore_value: no
+    initial_value: 'true'
+
+  - id: ${improv_ble_in_progress_id}
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+
+  - id: ${voice_assistant_phase_global_id}
+    type: int
+    restore_value: no
+    initial_value: ${voice_assist_not_ready_phase_id}
+
+  - id: ${voice_assistant_phase_prev_id}
+    type: int
+    restore_value: no
+    initial_value: "1"
+
+  - id: ${saved_alarm_time_id}
+    type: std::string
+    restore_value: yes
+    initial_value: '"Unknown"'
+
+  - id: ${saved_time_zone_id}
+    type: std::string
+    restore_value: yes
+    initial_value: '"UTC0"'
+
+  - id: ${saved_alarm_action_id}
+    type: std::string
+    restore_value: yes
+    initial_value: '"Riproduci suono"'
+
+  - id: ${first_active_timer_id}
+    type: voice_assistant::Timer
+    restore_value: no
+
+  - id: ${is_timer_active_id}
+    type: bool
+    restore_value: no
+
+  - id: ${fw_update_check_enabled_id}
+    type: bool
+    restore_value: yes
+    initial_value: "true"
+
+  - id: ${fw_update_available_id}
+    type: bool
+    restore_value: no
+    initial_value: "false"
+
+  - id: ${fw_latest_version_id}
+    type: std::string
+    restore_value: no
+    initial_value: '"unknown"'
+
+  - id: ${va_modalita_continua_id}
+    type: bool
+    restore_value: yes
+    initial_value: "true"
+
+  - id: ${va_ultimo_input_ms_id}
+    type: uint32_t
+    restore_value: no
+    initial_value: "0"
+
+# ======================================================
+# SCRIPT
+# ======================================================
+script:
+
+  - id: ${script_control_brightness_apply_id}
+    mode: restart
+    then:
+      - light.turn_on:
+          id: ${display_backlight_id}
+          brightness: !lambda "return id(ui_brightness_level);"
+
+  - id: ${script_control_start_va_id}
+    mode: restart
+    then:
+      - micro_wake_word.stop:
+
+      - lambda: |-
+          id(${display_awake_until_id}) = millis() + 300000UL;
+          id(${voice_assistant_phase_global_id}) = ${voice_assist_waiting_for_command_phase_id};
+          id(${va_ultimo_input_ms_id}) = millis();
+
+      - if:
+          condition:
+            lambda: "return id(${va_modalita_continua_id});"
+          then:
+            - voice_assistant.start_continuous:
+          else:
+            - voice_assistant.start:
+  
+  - id: ${script_va_local_volume_up_id}
+    mode: restart
+    then:
+      - media_player.volume_up: ${media_player_id}
+
+  - id: ${script_va_local_volume_down_id}
+    mode: restart
+    then:
+      - media_player.volume_down: ${media_player_id}
+
+  - id: ${script_va_local_mute_on_id}
+    mode: restart
+    then:
+      - media_player.mute: ${media_player_id}
+
+  - id: ${script_va_local_mute_off_id}
+    mode: restart
+    then:
+      - media_player.unmute: ${media_player_id}
+
+  - id: ${script_va_local_silent_on_id}
+    mode: restart
+    then:
+      - switch.turn_on: ${mic_mute_switch_id}
+
+  - id: ${script_va_stop_id}
+    mode: restart
+    then:
+      - voice_assistant.stop:
+      - lambda: |-
+          id(${voice_assistant_phase_global_id}) = ${voice_assist_idle_phase_id};
+      - script.execute: ${script_ensure_wake_word_running_id}
+
+  - id: ${script_va_local_alarm_on_id}
+    mode: restart
+    then:
+      - switch.turn_on: ${antifurto_switch_id}
+
+  - id: ${script_va_local_alarm_off_id}
+    mode: restart
+    then:
+      - switch.turn_off: ${antifurto_switch_id}  
+
+  - id: ${script_start_va_from_wake_word_id}
+    mode: restart
+    parameters:
+      detected_wake_word: std::string
+    then:
+      - lambda: |-
+          id(${wake_word_flow_active_id}) = true;
+          id(${display_awake_until_id}) = millis() + 300000UL;
+          id(${voice_assistant_phase_global_id}) = ${voice_assist_waiting_for_command_phase_id};
+          id(${va_ultimo_input_ms_id}) = millis();
+
+      - if:
+          condition:
+            switch.is_on: ${wake_sound_switch_id}
+          then:
+            - script.execute:
+                id: ${script_play_sound_id}
+                priority: false
+                sound_file: !lambda return id(${wake_word_triggered_sound_id});
+
+            # Piccola attesa per lasciare partire e finire il ding.
+            # Se il file è più lungo, aumenta a 500/600ms.
+            - delay: 400ms
+
+      - if:
+          condition:
+            lambda: return id(${va_modalita_continua_id});
+          then:
+            - voice_assistant.start_continuous:
+          else:
+            - voice_assistant.start:
+                wake_word: !lambda return detected_wake_word;
+
+      - delay: 200ms
+      - lambda: |-
+          id(${wake_word_flow_active_id}) = false;
+
+  - id: ${script_ensure_wake_word_running_id}
+    mode: restart
+    then:
+      - delay: 800ms
+
+      - if:
+          condition:
+            and:
+              - api.connected:
+              - voice_assistant.connected:
+              - switch.is_off: ${mic_mute_switch_id}
+              - switch.is_off: ${timer_ringing_switch_id}
+              - not:
+                  voice_assistant.is_running:
+              - lambda: |-
+                  return !id(${wake_word_flow_active_id});
+              - lambda: |-
+                  const auto s = id(${media_player_id}).state;
+                  return s != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING &&
+                         s != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING;
+          then:
+            - if:
+                condition:
+                  micro_wake_word.is_running:
+                then:
+                  - logger.log:
+                      level: INFO
+                      format: "==== MWW: gia attivo"
+                else:
+                  - logger.log:
+                      level: INFO
+                      format: "==== MWW: START sicuro"
+                  - micro_wake_word.start:
+          else:
+            - logger.log:
+                level: INFO
+                format: "==== MWW: start saltato, condizioni non pronte"
+
+  - id: ${script_ring_timer_id}
+    then:
+      - script.execute: ${script_enable_repeat_one_id}
+      - script.execute:
+          id: ${script_play_sound_id}
+          priority: true
+          sound_file: !lambda return id(${timer_finished_sound_id});
+
+  - id: ${script_enable_repeat_one_id}
+    then:
+      - lambda: |-
+          id(${media_player_id})
+            ->make_call()
+            .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_REPEAT_ONE)
+            .set_announcement(true)
+            .perform();
+          id(${media_player_id})->set_playlist_delay_ms(speaker::AudioPipelineType::ANNOUNCEMENT, 500);
+
+  - id: ${script_disable_repeat_id}
+    then:
+      - lambda: |-
+          id(${media_player_id})
+            ->make_call()
+            .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_REPEAT_OFF)
+            .set_announcement(true)
+            .perform();
+          id(${media_player_id})->set_playlist_delay_ms(speaker::AudioPipelineType::ANNOUNCEMENT, 0);
+
+  - id: ${script_play_sound_id}
+    parameters:
+      priority: bool
+      sound_file: "audio::AudioFile*"
+    then:
+      - lambda: |-
+          if (priority) {
+            id(${media_player_id})
+              ->make_call()
+              .set_command(media_player::MediaPlayerCommand::MEDIA_PLAYER_COMMAND_STOP)
+              .set_announcement(true)
+              .perform();
+          }
+          if ((id(${media_player_id}).state != media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING) || priority) {
+            id(${media_player_id})->play_file(sound_file, true, false);
+          }
+
+  - id: ${script_fetch_first_active_timer_id}
+    mode: single
+    then:
+      - lambda: |-
+          static uint32_t last_fetch_time = 0;
+          uint32_t now = millis();
+          if (now - last_fetch_time < 500) return;
+          last_fetch_time = now;
+
+          const auto &timers = id(${voice_assistant_id}).get_timers();
+          if (timers.empty()) return;
+
+          auto output_timer = *timers.begin();
+          for (const auto &timer : timers) {
+            if (timer.is_active && timer.seconds_left <= output_timer.seconds_left) {
+              output_timer = timer;
+            }
+          }
+          id(${first_active_timer_id}) = output_timer;
+
+  - id: ${script_check_if_timers_active_id}
+    then:
+      - lambda: |-
+          const auto &timers = id(${voice_assistant_id}).get_timers();
+          bool output = false;
+          if (!timers.empty()) {
+            for (const auto &timer : timers) {
+              if (timer.is_active) {
+                output = true;
+                break;
+              }
+            }
+          }
+          id(${is_timer_active_id}) = output;
+
+  - id: ${script_activate_stop_word_once_id}
+    then:
+      - delay: 1s
+      - if:
+          condition:
+            switch.is_off: ${timer_ringing_switch_id}
+          then:
+            - micro_wake_word.enable_model: ${wake_word_stop_model_id}
+            - wait_until:
+                not:
+                  media_player.is_announcing:
+            - if:
+                condition:
+                  switch.is_off: ${timer_ringing_switch_id}
+                then:
+                  - micro_wake_word.disable_model: ${wake_word_stop_model_id}
+
+  - id: ${script_check_alarm_id}
+    then:
+      - lambda: |-
+          id(${script_publish_current_time_id}).execute();
+          if (id(${alarm_on_switch_id}).state && id(${alarm_time_text_id}).has_state()) {
+            auto set_alarm_time = id(${alarm_time_text_id}).state;
+            if (set_alarm_time.length() == 5 &&
+                isdigit(set_alarm_time[0]) && isdigit(set_alarm_time[1]) &&
+                isdigit(set_alarm_time[3]) && isdigit(set_alarm_time[4])) {
+              auto alarm_hour = std::stoi(set_alarm_time.substr(0, 2));
+              auto alarm_minute = std::stoi(set_alarm_time.substr(3, 2));
+
+              auto time_now = id(${rtc_id}).now();
+              if (time_now.hour == alarm_hour && time_now.minute == alarm_minute) {
+                auto action = id(${alarm_action_select_id}).state;
+                if (action == "Riproduci suono") {
+                  id(${timer_ringing_switch_id}).turn_on();
+                } else if (action == "Invia evento") {
+                  id(${script_send_alarm_event_id}).execute();
+                } else if (action == "Suono ed evento") {
+                  id(${timer_ringing_switch_id}).turn_on();
+                  id(${script_send_alarm_event_id}).execute();
+                }
+              }
+            } else {
+              ESP_LOGW("alarm", "Incorrect alarm time setting");
+            }
+          }
+
+  - id: ${script_send_alarm_event_id}
+    then:
+      - homeassistant.event:
+          event: esphome.alarm_ringing
+
+  - id: ${script_send_tts_uri_event_id}
+    parameters:
+      tts_uri: string
+    then:
+      - homeassistant.event:
+          event: esphome.tts_uri
+          data:
+            uri: !lambda return tts_uri;
+
+  - id: ${script_send_stt_text_event_id}
+    parameters:
+      stt_text: string
+    then:
+      - homeassistant.event:
+          event: esphome.stt_text
+          data:
+            text: !lambda return stt_text;
+
+  - id: ${script_publish_current_time_id}
+    mode: single
+    then:
+      - lambda: |-
+          static std::string last_time_string = "";
+          auto time_now = id(${rtc_id}).now();
+          std::string current_time_string = time_now.strftime("%H:%M");
+          if (current_time_string != last_time_string) {
+            id(${current_time_text_id}).publish_state(current_time_string);
+            last_time_string = current_time_string;
+          }
+
+  - id: ${script_check_firmware_version_id}
+    mode: restart
+    then:
+      - if:
+          condition:
+            lambda: return id(${fw_update_check_enabled_id});
+          then:
+            - logger.log:
+                level: INFO
+                format: "==== Firmware check: start"
+            - http_request.get:
+                url: "https://raw.githubusercontent.com/MarcoFre/ESP32-S3-AI-Smart-Speaker/main/OTA/version.yaml"
+                capture_response: true
+                max_response_buffer_size: 512
+                on_response:
+                  then:
+                    - lambda: |-
+                        if (response->status_code != 200) {
+                          ESP_LOGW("fw_check", "HTTP status invalid: %d", response->status_code);
+                          return;
+                        }
+
+                        std::string s = body;
+
+                        while (!s.empty() && (s.back() == '\n' || s.back() == '\r' || s.back() == ' ' || s.back() == '\t')) s.pop_back();
+                        while (!s.empty() && (s.front() == '\n' || s.front() == '\r' || s.front() == ' ' || s.front() == '\t')) s.erase(0, 1);
+
+                        std::string latest = "";
+                        const std::string key = "version:";
+                        auto pos = s.find(key);
+                        if (pos != std::string::npos) {
+                          latest = s.substr(pos + key.length());
+                          while (!latest.empty() && (latest.front() == ' ' || latest.front() == '\t')) latest.erase(0, 1);
+                          while (!latest.empty() && (latest.back() == '\n' || latest.back() == '\r' || latest.back() == ' ' || latest.back() == '\t')) latest.pop_back();
+                        }
+
+                        if (latest.empty()) {
+                          ESP_LOGW("fw_check", "Remote version not found");
+                          return;
+                        }
+
+                        id(${fw_latest_version_id}) = latest;
+                        id(${fw_update_available_id}) = (latest != std::string("${fw_version}"));
+
+                        ESP_LOGI("fw_check",
+                                 "Local=%s Remote=%s Update=%d",
+                                 "${fw_version}",
+                                 id(${fw_latest_version_id}).c_str(),
+                                 (int) id(${fw_update_available_id}));
+
+                        if (id(${fw_update_available_id})) {
+                          id(${display_awake_until_id}) = millis() + 300000UL;
+                        }
+                on_error:
+                  then:
+                    - logger.log:
+                        level: WARN
+                        format: "==== Firmware check: HTTP error"
+
+  - id: ${script_flash_ring_id}
+    mode: restart
+    then:
+      - light.turn_on:
+          id: ${display_backlight_id}
+          brightness: 100%
+      - delay: 120ms
+      - light.turn_on:
+          id: ${display_backlight_id}
+          brightness: 80%
+
+  - id: ${script_antifurto_trigger_id}
+    mode: restart
+    then:
+      - lambda: |-
+          id(${antifurto_alarm_in_corso_id}) = true;
+          id(${display_awake_until_id}) = millis() + 300000UL;
+          id(${display_startled_until_id}) = millis() + 2200UL;
+      - logger.log:
+          level: WARN
+          format: "==== ANTIFURTO: rumore rilevato"
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+time:
+  - platform: homeassistant
+    id: ${rtc_id}
+    on_time:
+      - seconds: 0
+        minutes: /1
+        then:
+          - script.execute: ${script_check_alarm_id}
+    on_time_sync:
+      - script.execute: ${script_publish_current_time_id}
+
+interval:
+  - interval: 24h
+    then:
+      - if:
+          condition:
+            wifi.connected:
+          then:
+            - if:
+                condition:
+                  lambda: return id(${fw_update_check_enabled_id});
+                then:
+                  - script.execute: ${script_check_firmware_version_id} 
+
+  - interval: 5s
+    then:
+      - if:
+          condition:
+            lambda: |-
+              return id(${va_modalita_continua_id}) &&
+                     id(${voice_assistant_id}).is_running() &&
+                     id(${voice_assistant_phase_global_id}) != ${voice_assist_thinking_phase_id} &&
+                     id(${voice_assistant_phase_global_id}) != ${voice_assist_replying_phase_id} &&
+                     id(${voice_assistant_phase_global_id}) != ${voice_assist_error_phase_id} &&
+                     id(${va_ultimo_input_ms_id}) > 0 &&
+                     (millis() - id(${va_ultimo_input_ms_id}) > 60000UL);
+          then:
+            - logger.log:
+                level: INFO
+                format: "==== Modalita continua: stop per inattivita"
+            - voice_assistant.stop:
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly}
+  min_version: 2025.8.0
+  compile_process_limit: 1
+  platformio_options:
+    board_build.flash_mode: dio
+    board_build.f_flash: 80000000L
+    board_build.f_cpu: 240000000L
+  project:
+    name: Waveshare HackMyHome.DisplayTest
+    version: ${fw_version}
+
+  on_boot:
+    - priority: 375
+      then:
+        - sensor.template.publish:
+            id: ${next_timer_sensor_id}
+            state: -1
+        - delay: 10min
+        - if:
+            condition:
+              lambda: return id(${init_in_progress_id});
+            then:
+              - lambda: id(${init_in_progress_id}) = false;
+
+    - priority: -50
+      then:
+        # Re-apply restored numeric settings to the live audio components.
+        - lambda: |-
+            if (!std::isnan(id(${mic_gain_number_id}).state)) {
+              id(${mic_gain_saved_id}) = id(${mic_gain_number_id}).state;
+              if (!id(${mic_mute_switch_id}).state) {
+                id(${audio_adc_id}).set_mic_gain(id(${mic_gain_number_id}).state);
+              }
+            }
+            if (!std::isnan(id(${va_gain_factor_number_id}).state)) {
+              id(${va_microphone_id}).set_gain_factor(id(${va_gain_factor_number_id}).state);
+            }
+            if (!std::isnan(id(${va_noise_suppression_number_id}).state)) {
+              id(${voice_assistant_id}).set_noise_suppression_level(id(${va_noise_suppression_number_id}).state);
+            }
+
+    - priority: -100
+      then:
+        - lambda: |-
+            id(${alarm_time_text_id}).publish_state(id(${saved_alarm_time_id}));
+        - lambda: |-
+            auto call = id(${alarm_action_select_id}).make_call();
+            call.set_option(id(${saved_alarm_action_id}));
+            call.perform();
+        - lambda: |-
+            setenv("TZ", id(${saved_time_zone_id}).c_str(), 1);
+            tzset();
+
+esp32:
+  board: esp32-s3-devkitc-1
+  cpu_frequency: 240MHz
+  variant: esp32s3
+  flash_size: 16MB
+  framework:
+    type: esp-idf
+    version: recommended
+    sdkconfig_options:
+      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      COMPILER_OPTIMIZATION_SIZE: "y"
+      CONFIG_ESP32S3_DEFAULT_CPU_FREQ_240: "y"
+      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
+      CONFIG_SPIRAM_FETCH_INSTRUCTIONS: "y"
+      CONFIG_SPIRAM_RODATA: "y"
+      CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=: "y"
+      CONFIG_FREERTOS_HZ=: "1000"
+      CONFIG_ESPTOOLPY_FLASHMODE_QIO=: "y"
+      CONFIG_ESPTOOLPY_FLASHFREQ_120M=: "y"
+      CONFIG_SPIRAM_MODE_OCT=: "y"
+      CONFIG_SPIRAM_SPEED_120M=: "y"
+      CONFIG_COMPILER_OPTIMIZATION_PERF=: "y"
+    advanced:
+      enable_idf_experimental_features: true
+
+wifi:
+  id: ${wifi_component_id}
+  ssid: ${ssid}
+  password: ${password}
+  reboot_timeout: 10min
+  manual_ip:
+    static_ip: ${ip}
+    gateway:   ${gateway}
+    subnet:    ${subnet}
+    dns1:      ${dns}
+    dns2:      8.8.8.8
+  on_connect:
+    - lambda: id(${improv_ble_in_progress_id}) = false;
+    - delay: 3s
+    - script.execute: ${script_check_firmware_version_id}
+    - script.execute:
+        id: ${script_play_sound_id}
+        priority: true
+        sound_file: !lambda return id(${wake_word_triggered_sound_id});
+    - delay: 1500ms
+
+  ap:
+    ssid: ${device_name}
+    password: ${password}
+
+captive_portal:
+
+http_request:
+  verify_ssl: true
+  timeout: 10s
+
+logger:
+  level: INFO
+
+api:
+  id: ${api_component_id}
+  encryption:
+    key: ${api_key}
+
+  actions:
+    - action: set_led_color
+      variables:
+        red: float
+        green: float
+        blue: float
+      then:
+        - lambda: |-
+            id(${led_ring_color_r_id}) = std::min(1.0f, std::max(0.0f, red));
+            id(${led_ring_color_g_id}) = std::min(1.0f, std::max(0.0f, green));
+            id(${led_ring_color_b_id}) = std::min(1.0f, std::max(0.0f, blue));
+
+    - action: start_va
+      then:
+        - if:
+            condition:
+              lambda: return id(${va_modalita_continua_id});
+            then:
+              - voice_assistant.start_continuous:
+              - logger.log:
+                  level: INFO
+                  format: "==== API: VoiceAssistant in modalita continua"
+            else:
+              - voice_assistant.start:
+              - logger.log:
+                  level: INFO
+                  format: "==== API: VoiceAssistant in modalita singola"
+
+    - action: stop_va
+      then:
+        - voice_assistant.stop:
+        - logger.log:
+            level: INFO
+            format: "==== API: VoiceAssistant STOP"
+
+
+    - action: set_alarm_time
+      variables:
+        alarm_time_hh_mm: string
+      then:
+        - logger.log:
+            level: INFO
+            format: "==== API: SET ALARM"
+        - lambda: |-
+            if (alarm_time_hh_mm.length() == 5 &&
+                isdigit(alarm_time_hh_mm[0]) && isdigit(alarm_time_hh_mm[1]) &&
+                isdigit(alarm_time_hh_mm[3]) && isdigit(alarm_time_hh_mm[4])) {
+              id(${alarm_time_text_id}).publish_state(alarm_time_hh_mm);
+              id(${saved_alarm_time_id}) = alarm_time_hh_mm;
+            }
+
+    - action: set_time_zone
+      variables:
+        posix_time_zone: string
+      then:
+        - logger.log:
+            level: INFO
+            format: "==== API: SET TIME ZONE"
+        - lambda: |-
+            setenv("TZ", posix_time_zone.c_str(), 1);
+            tzset();
+            id(${saved_time_zone_id}) = posix_time_zone;
+            id(${script_publish_current_time_id}).execute();
+
+  on_client_connected:
+    - logger.log:
+        level: INFO
+        format: "==== API: CONNECTED"
+    - script.execute:
+        id: ${script_play_sound_id}
+        priority: true
+        sound_file: !lambda return id(${wake_word_triggered_sound_id});
+    - delay: 1500ms
+    - script.execute: ${script_ensure_wake_word_running_id}
+    - lambda: |-
+        id(${voice_assistant_phase_global_id}) = ${voice_assist_idle_phase_id};
+    - delay: 100ms
+
+  on_client_disconnected:
+    - logger.log:
+        level: INFO
+        format: "==== API: DISCONNECTED"
+
+ota:
+  - platform: esphome
+    id: ${ota_component_id}
+    password: ${ota_key}
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/sw3Dan/waveshare-s2-audio_esphome_voice
+      ref: main
+    components: [ es8311 ]
+    refresh: 0s
+
+# ======================================================
+# BLE SYNC - HackMyHome Dual Assistant
+# ======================================================
+
+esp32_ble_beacon:
+  type: iBeacon
+  uuid: ${ble_sync_uuid}
+  major: ${ble_sync_major}
+  minor: ${my_ble_minor}
+  min_interval: 500ms
+  max_interval: 1000ms
+  tx_power: 3dBm
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 320ms
+    window: 120ms
+    active: false
+    continuous: true
+
+# ======================================================
+# I2C e PCA9554
+# ======================================================
+i2c:
+  - id: ${i2c_bus_id}
+    sda: ${i2c_sda}
+    scl: ${i2c_scl}
+    scan: true
+    frequency: 100kHz
+pca9554:
+  - id: ${io_expander_id}
+    i2c_id: ${i2c_bus_id}
+    address: 0x20
+
+# ======================================================
+# BACKLIGHT
+# ======================================================
+output:
+  - platform: ledc
+    id: ${display_backlight_output_id}
+    pin: ${display_bl_pin}
+    frequency: 1000Hz
+light:
+  - platform: monochromatic
+    id: ${display_backlight_id}
+    name: "Display Backlight"
+    output: ${display_backlight_output_id}
+    restore_mode: ALWAYS_ON
+    default_transition_length: 250ms
+
+# ======================================================
+# I2S AUDIO - OUT + IN con clock condivisi
+# ======================================================
+i2s_audio:
+  - id: ${i2s_output_id}
+    i2s_mclk_pin:
+      number: ${i2s_mclk}
+      allow_other_uses: true
+    i2s_bclk_pin:
+      number: ${i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${i2s_lrclk}
+      allow_other_uses: true
+
+  - id: ${i2s_input_id}
+    i2s_mclk_pin:
+      number: ${i2s_mclk}
+      allow_other_uses: true
+    i2s_bclk_pin:
+      number: ${i2s_bclk}
+      allow_other_uses: true
+    i2s_lrclk_pin:
+      number: ${i2s_lrclk}
+      allow_other_uses: true
+
+# ======================================================
+# AUDIO ADC - ES7210 / MICROFONO
+# ======================================================
+audio_adc:
+  - platform: es7210
+    id: ${audio_adc_id}
+    i2c_id: ${i2c_bus_id}
+    sample_rate: ${i2s_sample_rate}
+    bits_per_sample: ${i2s_bps_mic}
+
+# ======================================================
+# AUDIO DAC - ES8311
+# ======================================================
+audio_dac:
+  - platform: es8311
+    id: ${audio_dac_id}
+    i2c_id: ${i2c_bus_id}
+    address: 0x18
+    bits_per_sample: 16bit
+    sample_rate: 48000
+
+# ======================================================
+# MICROFONO I2S - ES7210
+# ======================================================
+microphone:
+  - platform: i2s_audio
+    id: ${microphone_id}
+    i2s_audio_id: ${i2s_input_id}
+    i2s_din_pin: ${i2s_din}
+    adc_type: external
+    pdm: false
+    sample_rate: ${i2s_sample_rate}
+    bits_per_sample: ${i2s_bps_mic}
+    use_apll: ${i2s_use_apll}
+    mclk_multiple: ${i2s_mclk_multiple}
+    # Il microfono riusa i clock generati dal bus speaker.
+    i2s_mode: ${i2s_mode_mic}
+    channel: left
+
+# ======================================================
+# SPEAKER PIPELINE
+# ======================================================
+speaker:
+  # Uscita fisica verso ES8311
+  - platform: i2s_audio
+    id: ${hw_speaker_id}
+    i2s_audio_id: ${i2s_output_id}
+    i2s_dout_pin: ${i2s_dout}
+    dac_type: external
+    audio_dac: es8311_dac
+    sample_rate: ${i2s_sample_rate}
+    bits_per_sample: ${i2s_bps_spk}
+    channel: mono
+    use_apll: ${i2s_use_apll}
+    i2s_mode: ${i2s_mode_speaker}
+    buffer_duration: 500ms
+    timeout: never
+
+  # Mixer: media + annunci sullo stesso speaker fisico
+  - platform: mixer
+    id: ${audio_mixer_speaker_id}
+    output_speaker: ${hw_speaker_id}
+    source_speakers:
+      - id: ${announcement_mixer_input_id}
+        timeout: never
+      - id: ${media_mixer_input_id}
+        timeout: never
+
+  # Resampler media
+  - platform: resampler
+    id: ${media_resampler_id}
+    output_speaker: ${media_mixer_input_id}
+    sample_rate: ${i2s_sample_rate}
+    bits_per_sample: 16
+
+  # Resampler annunci / TTS
+  - platform: resampler
+    id: ${announcement_resampler_id}
+    output_speaker: ${announcement_mixer_input_id}
+    sample_rate: ${i2s_sample_rate}
+    bits_per_sample: 16
+
+# ======================================================
+# MEDIA PLAYER
+# ======================================================
+media_player:
+  - platform: speaker
+    id: ${media_player_id}
+    name: "Media Player"
+
+    media_pipeline:
+      speaker: ${media_resampler_id}
+      format: FLAC
+      sample_rate: 48000
+      num_channels: 1
+
+    announcement_pipeline:
+      speaker: ${announcement_resampler_id}
+      format: FLAC
+      sample_rate: 48000
+      num_channels: 1
+
+    volume_increment: 0.05
+    volume_initial: 0.5
+    volume_min: 0.05
+    volume_max: 1.0
+
+    buffer_size: 500000
+    task_stack_in_psram: true
+
+    on_announcement:
+      - logger.log:
+          level: INFO
+          format: "==== MEDIAPLAYER: ANNUNCIO"
+      - lambda: |-
+          id(${display_awake_until_id}) = millis() + 300000UL;
+          // Se parte un annuncio e non è il timer, mostriamo la faccina parlante.
+          if (!id(${timer_ringing_switch_id}).state) {
+            if (id(${voice_assistant_phase_global_id}) != ${voice_assist_waiting_for_command_phase_id}) {
+              id(${voice_assistant_phase_global_id}) = ${voice_assist_replying_phase_id};
+            }          
+          }          
+      - mixer_speaker.apply_ducking:
+          id: ${media_mixer_input_id}
+          decibel_reduction: 0
+          duration: 1s
+
+    on_play:
+      - logger.log:
+          level: INFO
+          format: "==== MEDIAPLAYER: PLAY"
+          
+    on_idle:
+      - logger.log:
+          level: INFO
+          format: "==== MEDIAPLAYER: IDLE"
+      - script.execute: ${script_ensure_wake_word_running_id}
+      - if:
+          condition:
+            and:
+              - switch.is_off: ${timer_ringing_switch_id}
+              - not:
+                  voice_assistant.is_running:
+              - not:
+                  media_player.is_announcing: ${media_player_id}
+          then:
+            - mixer_speaker.apply_ducking:
+                id: ${media_mixer_input_id}
+                decibel_reduction: 0
+                duration: 1.0s
+
+            - logger.log:
+                level: INFO
+                format: "==== MEDIAPLAYER: IDLE"
+
+    files:
+      - id: ${mute_switch_on_sound_id}
+        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_on.flac
+      - id: ${mute_switch_off_sound_id}
+        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/mute_switch_off.flac
+      - id: ${timer_finished_sound_id}
+        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/timer_finished.flac
+      - id: ${wake_word_triggered_sound_id}
+        file: https://github.com/esphome/home-assistant-voice-pe/raw/dev/sounds/wake_word_triggered.flac
+
+# ======================================================
+# VOICE ASSISTANT
+# ======================================================
+voice_assistant:
+  id: ${voice_assistant_id}
+  microphone:
+    id: ${va_microphone_id}
+    microphone: ${microphone_id}
+    channels: $which_mic
+  media_player: ${media_player_id}
+  micro_wake_word: ${micro_wake_word_id}
+  use_wake_word: false
+  noise_suppression_level: 0
+  auto_gain: 0 dbfs
+  volume_multiplier: 1
+
+  on_client_connected:
+    - logger.log:
+        level: INFO
+        format: "==== VOICEASSISTANT: CONNECTED"
+    - micro_wake_word.stop:
+    - if:
+        condition:
+          and:
+            - lambda: return id(${init_in_progress_id});
+            - switch.is_on: ${mic_mute_switch_id}
+        then:
+          - switch.turn_off: ${mic_mute_switch_id}
+    - lambda: id(${init_in_progress_id}) = false;
+    - lambda: id(${voice_assistant_phase_global_id}) = ${voice_assist_idle_phase_id};
+    - delay: 800ms
+    - script.execute: ${script_ensure_wake_word_running_id}
+
+  on_client_disconnected:
+    - logger.log:
+        level: INFO
+        format: "==== VOICEASSISTANT: DISCONNECTED"
+    - voice_assistant.stop:
+    - lambda: id(${voice_assistant_phase_global_id}) = ${voice_assist_not_ready_phase_id};
+
+  on_error:
+    - logger.log:
+        level: INFO
+        format: "==== VOICEASSISTANT: ERROR"
+    - if:
+        condition:
+          and:
+            - lambda: return !id(${init_in_progress_id});
+            - lambda: return code != "duplicate_wake_up_detected";
+            - lambda: return code != "stt-no-text-recognized";
+        then:
+          - lambda: id(${voice_assistant_phase_global_id}) = ${voice_assist_error_phase_id};
+
+  on_start:
+    - logger.log:
+        level: INFO
+        format: "==== VOICEASSISTANT: ON_START"
+    - lambda: |-
+        id(${va_ultimo_input_ms_id}) = millis();
+    - mixer_speaker.apply_ducking:
+        id: ${media_mixer_input_id}
+        decibel_reduction: 30
+        duration: 0.0s
+
+  on_listening:
+    - logger.log:
+        level: INFO
+        format: "==== VOICEASSISTANT: LISTENING"
+    - lambda: |-
+        id(${voice_assistant_phase_global_id}) = ${voice_assist_waiting_for_command_phase_id};
+        id(${va_ultimo_input_ms_id}) = millis();
+
+  on_stt_vad_start:
+    - logger.log:
+        level: INFO
+        format: "==== VOICEASSISTANT: VAD_START"
+    - lambda: |-
+        id(${voice_assistant_phase_global_id}) = ${voice_assist_listening_for_command_phase_id};
+        id(${va_ultimo_input_ms_id}) = millis();
+
+  on_stt_vad_end:
+    - logger.log:
+        level: INFO
+        format: "==== VOICEASSISTANT: VAD_END"
+    - lambda: |-
+        id(${voice_assistant_phase_global_id}) = ${voice_assist_thinking_phase_id};
+        id(${va_ultimo_input_ms_id}) = millis();
+
+  on_intent_progress:
+    - logger.log:
+        level: INFO
+        format: "==== VOICEASSISTANT: INTENT_PROGRESS"
+    - if:
+        condition:
+          lambda: 'return !x.empty();'
+        then:
+          - script.execute: ${script_activate_stop_word_once_id}
+
+  on_tts_start:
+    - logger.log:
+        level: INFO
+        format: "==== VOICEASSISTANT: TTS_START"
+    - lambda: |-
+        id(${va_ultimo_input_ms_id}) = millis();
+    - if:
+        condition:
+          lambda: 'return id(${voice_assistant_phase_global_id}) != ${voice_assist_replying_phase_id};'
+        then:
+          - script.execute: ${script_activate_stop_word_once_id}
+
+  on_tts_end:
+    - logger.log:
+        level: INFO
+        format: "==== VOICEASSISTANT: TTS_END"
+    - script.execute:
+        id: ${script_send_tts_uri_event_id}
+        tts_uri: !lambda 'return x;'
+
+  on_stt_end:
+    - logger.log:
+        level: INFO
+        format: "==== VOICEASSISTANT: STT_END"
+    - lambda: |-
+        id(${va_ultimo_input_ms_id}) = millis();
+        id(${local_cmd_code_id}) = 0;
+    - script.execute:
+        id: ${script_send_stt_text_event_id}
+        stt_text: !lambda 'return x;'
+
+    - lambda: |-
+        id(${local_cmd_code_id}) = 0;
+        std::string t = x;
+        std::transform(t.begin(), t.end(), t.begin(),
+          [](unsigned char c) { return std::tolower(c); });
+
+        auto has = [&](const char *term) -> bool {
+          return t.find(term) != std::string::npos;
+        };
+
+        // ===== modalità silenziosa =====
+        if (has("$silent_mode") || has("$silent_mode_acc")) {
+          id(${local_cmd_code_id}) = 1;
+        // ===== volume locale =====
+        } else if ((has("$up") || has("$increase")) && has("$volume")) {
+          id(${local_cmd_code_id}) = 2;
+        } else if ((has("$down") || has("$reduce")) && has("$volume")) {
+          id(${local_cmd_code_id}) = 3;
+
+        // ===== antifurto locale =====
+        } else if ((has("$enable") || has("$allow") || has("$arm")) &&
+                 has("$alarm")) {
+          id(${local_cmd_code_id}) = 4;
+        } else if ((has("$disable") || has("$deny") || has("$disarm")) &&
+                   has("$alarm")) {
+          id(${local_cmd_code_id}) = 5;
+        }
+
+    - if:
+        condition:
+          lambda: 'return id(${local_cmd_code_id}) == 1;'
+        then:
+          - media_player.stop: ${media_player_id}
+    - if:
+        condition:
+          lambda: 'return id(${local_cmd_code_id}) == 2;'
+        then:
+          - script.execute: ${script_va_local_volume_up_id}
+
+    - if:
+        condition:
+          lambda: 'return id(${local_cmd_code_id}) == 3;'
+        then:
+          - script.execute: ${script_va_local_volume_down_id}
+
+    - if:
+        condition:
+          lambda: 'return id(${local_cmd_code_id}) == 4;'
+        then:
+          - script.execute: ${script_va_local_alarm_on_id}
+
+    - if:
+        condition:
+          lambda: 'return id(${local_cmd_code_id}) == 5;'
+        then:
+          - script.execute: ${script_va_local_alarm_off_id}
+
+    - if:
+        condition:
+          lambda: 'return id(${local_cmd_code_id}) != 0;'
+        then:
+          - logger.log:
+              level: INFO
+              format: "==== VOICEASSISTANT: LOCAL INTENT -> stop pipeline"
+          - voice_assistant.stop:
+          - script.execute: ${script_ensure_wake_word_running_id}
+          - lambda: |-
+              id(${voice_assistant_phase_global_id}) = ${voice_assist_idle_phase_id};
+
+  on_end:
+    - logger.log:
+        level: INFO
+        format: "==== VOICEASSISTANT: ON_END"
+    - wait_until:
+        not:
+          voice_assistant.is_running:
+    - mixer_speaker.apply_ducking:
+          id: ${media_mixer_input_id}
+          decibel_reduction: 0
+          duration: 1.0s
+    - if:
+        condition:
+          lambda: return id(${voice_assistant_phase_global_id}) == ${voice_assist_error_phase_id};
+        then:
+          - delay: 1s
+    - lambda: id(${voice_assistant_phase_global_id}) = ${voice_assist_idle_phase_id};
+    - script.execute: ${script_ensure_wake_word_running_id}
+
+  on_timer_finished:
+    - switch.turn_on: ${timer_ringing_switch_id}
+    - lambda: |-
+        id(${next_timer_sensor_id}).publish_state(-1);
+        id(${next_timer_name_sensor_id}).publish_state("-");
+        id(${va_timer_total_seconds_id}) = 0;
+        id(${va_timer_seconds_left_id})  = 0;
+        id(${va_timer_active_display_id}) = false;
+    - voice_assistant.stop:
+    - script.execute: ${script_ensure_wake_word_running_id}
+    - lambda: |-
+        id(${voice_assistant_phase_global_id}) = ${voice_assist_idle_phase_id};
+
+  on_timer_started:
+    - lambda: |-
+        id(${script_check_if_timers_active_id}).execute();
+        if (id(${is_timer_active_id})) {
+          id(${script_fetch_first_active_timer_id}).execute();
+          id(${next_timer_sensor_id}).publish_state(id(${first_active_timer_id}).seconds_left);
+          id(${next_timer_name_sensor_id}).publish_state(id(${first_active_timer_id}).name);
+          id(${va_timer_total_seconds_id}) = id(${first_active_timer_id}).total_seconds;
+          id(${va_timer_seconds_left_id})  = id(${first_active_timer_id}).seconds_left;
+          id(${va_timer_last_tick_ms_id})  = millis();
+          id(${va_timer_active_display_id}) = true;
+          id(${va_timer_name_display_id}) = id(${first_active_timer_id}).name;
+        }
+    - voice_assistant.stop: 
+    - lambda: |-
+        id(${voice_assistant_phase_global_id}) = ${voice_assist_idle_phase_id};
+    - voice_assistant.stop:
+    - script.execute: ${script_ensure_wake_word_running_id}
+    - lambda: |-
+        id(${voice_assistant_phase_global_id}) = ${voice_assist_idle_phase_id};
+
+  on_timer_cancelled:
+    - lambda: |-
+        id(${script_check_if_timers_active_id}).execute();
+        if (id(${is_timer_active_id})) {
+          id(${script_fetch_first_active_timer_id}).execute();
+          id(${next_timer_sensor_id}).publish_state(id(${first_active_timer_id}).seconds_left);
+          id(${next_timer_name_sensor_id}).publish_state(id(${first_active_timer_id}).name);
+          id(${va_timer_total_seconds_id}) = id(${first_active_timer_id}).total_seconds;
+          id(${va_timer_seconds_left_id})  = id(${first_active_timer_id}).seconds_left;
+          id(${va_timer_last_tick_ms_id})  = millis();
+          id(${va_timer_active_display_id}) = id(${first_active_timer_id}).is_active;
+          id(${va_timer_name_display_id}) = id(${first_active_timer_id}).name;
+        } else {
+          id(${next_timer_sensor_id}).publish_state(-1);
+          id(${next_timer_name_sensor_id}).publish_state("-");
+          id(${va_timer_total_seconds_id}) = 0;
+          id(${va_timer_seconds_left_id})  = 0;
+          id(${va_timer_active_display_id}) = false;
+          id(${va_timer_name_display_id}) = "";
+        }
+    - voice_assistant.stop:
+    - script.execute: ${script_ensure_wake_word_running_id}
+    - lambda: |-
+        id(${voice_assistant_phase_global_id}) = ${voice_assist_idle_phase_id};
+
+  on_timer_updated:
+    - lambda: |-
+        id(${script_check_if_timers_active_id}).execute();
+        if (id(${is_timer_active_id})) {
+          id(${script_fetch_first_active_timer_id}).execute();
+          id(${next_timer_sensor_id}).publish_state(id(${first_active_timer_id}).seconds_left);
+          id(${next_timer_name_sensor_id}).publish_state(id(${first_active_timer_id}).name);
+          id(${va_timer_total_seconds_id}) = id(${first_active_timer_id}).total_seconds;
+          id(${va_timer_seconds_left_id})  = id(${first_active_timer_id}).seconds_left;
+          id(${va_timer_last_tick_ms_id})  = millis();
+          id(${va_timer_active_display_id}) = id(${first_active_timer_id}).is_active;
+          id(${va_timer_name_display_id}) = id(${first_active_timer_id}).name;
+        }
+
+  on_timer_tick:
+    - lambda: |-
+        id(${script_fetch_first_active_timer_id}).execute();
+        int seconds_left = id(${first_active_timer_id}).seconds_left;
+        if (seconds_left % 5 == 0) {
+          id(${next_timer_sensor_id}).publish_state(seconds_left);
+        }
+        id(${va_timer_seconds_left_id})  = id(${first_active_timer_id}).seconds_left;
+        id(${va_timer_last_tick_ms_id})  = millis();
+
+# ======================================================
+# IMICRO WAKE WORD
+# ======================================================
+micro_wake_word:
+  id: ${micro_wake_word_id}
+  microphone: ${microphone_id}
+  stop_after_detection: false
+  models:
+    - model: https://github.com/kahrendt/microWakeWord/releases/download/okay_nabu_20241226.3/okay_nabu.json
+      id: ${wake_word_okay_nabu_model_id}
+    - model: https://raw.githubusercontent.com/formatBCE/Respeaker-Lite-ESPHome-integration/refs/heads/main/microwakeword/models/v2/kenobi.json
+      id: ${wake_word_kenobi_model_id}
+    - model: ${wake_word_hey_jarvis_model_id}
+      id: ${wake_word_hey_jarvis_model_id}
+    - model: https://github.com/kahrendt/microWakeWord/releases/download/stop/stop.json
+      id: ${wake_word_stop_model_id}
+      internal: true
+
+  on_wake_word_detected:
+    - logger.log:
+        level: INFO
+        format: "==== MWW: WORD DETECTED"
+
+    - if:
+        condition:
+          switch.is_off: ${mic_mute_switch_id}
+        then:
+          - if:
+              condition:
+                switch.is_on: ${timer_ringing_switch_id}
+              then:
+                - switch.turn_off: ${timer_ringing_switch_id}
+
+              else:
+                - if:
+                    condition:
+                      voice_assistant.is_running:
+                    then:
+                      - voice_assistant.stop:
+
+                    else:
+                      - if:
+                          condition:
+                            media_player.is_announcing: ${media_player_id}
+                          then:
+                            - media_player.stop:
+                                announcement: true
+
+                      - script.execute:
+                          id: ${script_start_va_from_wake_word_id}
+                          detected_wake_word: !lambda return wake_word;
+
+# ======================================================
+# FONT
+# ======================================================
+font:
+  - file: "gfonts://Roboto"
+    id: ${font_header_id}
+    size: 10
+  - file: "gfonts://Roboto"
+    id: ${font_timer_big_id}
+    size: 28
+  - file: "gfonts://Roboto"
+    id: ${font_timer_small_id}
+    size: 14
+
+# ======================================================
+# SPI
+# ======================================================
+spi:
+  id: ${display_qspi_id}
+  type: quad
+  clk_pin: ${display_clk_pin}
+  data_pins:
+    - ${display_qspi_d0}
+    - ${display_qspi_d1}
+    - ${display_qspi_d2}
+    - ${display_qspi_d3}
+
+# ======================================================
+# TOUCHSCREEN
+# ======================================================
+touchscreen:
+  - platform: cst816
+    id: ${touch_panel_id}
+    display: ${display_id}
+    i2c_id: ${i2c_bus_id}
+    address: ${touch_address}
+
+    interrupt_pin:
+      number: ${touch_interrupt_pin}
+      mode: INPUT_PULLUP
+
+    reset_pin:
+      pca9554: ${io_expander_id}
+      number: ${touch_reset_expander_pin}
+
+    skip_probe: true
+
+    transform:
+      mirror_x: true
+      mirror_y: true
+
+    on_touch:
+      - lambda: |-
+          const uint32_t now = millis();
+
+          id(${touch_x_id}) = touch.x;
+          id(${touch_y_id}) = touch.y;
+          id(${touch_counter_id})++;
+
+          id(${display_awake_until_id}) = now + 30000UL;
+          id(control_action_code) = 0;
+
+          // Spegne eventuale vecchio slider volume / freeze UI
+          id(touch_volume_drag_active) = false;
+          id(touch_volume_slider_until) = 0;
+          id(touch_ui_freeze_until) = 0;
+
+          // ======================================================
+          // TOUCH BUTTONS - PAGINA CONTROLLI
+          // Lo swipe si gestisce in on_update.
+          // Qui decidiamo solo quale azione eseguire.
+          // ======================================================
+          if (id(control_page_active)) {
+            id(control_page_until) = now + 15000UL;
+
+            if (now >= id(control_touch_cooldown_until)) {
+              int tx = touch.x;
+              int ty = touch.y;
+
+              if (tx < 0) tx = 0;
+              if (tx > 359) tx = 359;
+              if (ty < 0) ty = 0;
+              if (ty > 359) ty = 359;
+
+              auto hit_circle = [&](int bx, int by, int br) -> bool {
+                int hx = tx - bx;
+                int hy = ty - by;
+                return (hx * hx + hy * hy) <= (br * br);
+              };
+
+              const int r_small = 56;
+              const int r_big   = 64;
+
+              // Layout:
+              //
+              //          LUX
+              //
+              //    VOL-   VA   VOL+
+              //
+              //    MUTE        ALARM
+
+              if (hit_circle(80, 150, r_small)) {
+                id(control_action_code) = 1;   // Volume -
+
+              } else if (hit_circle(280, 150, r_small)) {
+                id(control_action_code) = 2;   // Volume +
+
+              } else if (hit_circle(80, 255, r_small)) {
+                id(ui_media_muted) = !id(ui_media_muted);
+                id(control_action_code) = id(ui_media_muted) ? 3 : 4;
+
+              } else if (hit_circle(180, 75, r_small)) {
+                float b = id(ui_brightness_level);
+
+                if (b < 0.45f) {
+                  b = 0.65f;
+                } else if (b < 0.85f) {
+                  b = 1.00f;
+                } else {
+                  b = 0.30f;
+                }
+
+                id(ui_brightness_level) = b;
+                id(control_action_code) = 5;
+
+              } else if (hit_circle(180, 180, r_big)) {
+                if (id(${voice_assistant_id}).is_running()) {
+                  id(control_action_code) = 7;
+                } else {
+                  id(control_action_code) = 6;
+                }
+
+              } else if (hit_circle(280, 255, r_small)) {
+                if (id(${antifurto_switch_id}).state) {
+                  id(control_action_code) = 9;
+                } else {
+                  id(control_action_code) = 8;
+                }
+              }
+
+              ESP_LOGI(
+                "touch_ui",
+                "Control tap raw=%d,%d action=%d",
+                touch.x,
+                touch.y,
+                id(control_action_code)
+              );
+
+              if (id(control_action_code) != 0) {
+                id(control_touch_cooldown_until) = now + 250UL;
+              }
+            }
+
+          } else {
+            ESP_LOGI(
+              "touch",
+              "Touch x=%d y=%d raw_x=%d raw_y=%d counter=%d",
+              touch.x,
+              touch.y,
+              touch.x_raw,
+              touch.y_raw,
+              id(${touch_counter_id})
+            );
+          }
+      # ------------------------------------------------------
+      # ACTION 1 - Volume giù
+      # ------------------------------------------------------
+      - logger.log:
+          level: INFO
+          format: "==== TOUCH CONTROL: Action %d"
+          args: [ 'id(control_action_code)' ]
+      - if:
+          condition:
+            lambda: "return id(control_action_code) == 1;"
+          then:
+            - media_player.volume_down: ${media_player_id}
+            - logger.log:
+                level: INFO
+                format: "==== TOUCH CONTROL: Volume -"
+
+      # ------------------------------------------------------
+      # ACTION 2 - Volume su
+      # ------------------------------------------------------
+      - if:
+          condition:
+            lambda: "return id(control_action_code) == 2;"
+          then:
+            - media_player.volume_up: ${media_player_id}
+            - logger.log:
+                level: INFO
+                format: "==== TOUCH CONTROL: Volume +"
+
+      # ------------------------------------------------------
+      # ACTION 3 - Mute ON
+      # ------------------------------------------------------
+      - if:
+          condition:
+            lambda: "return id(control_action_code) == 3;"
+          then:
+            - media_player.mute: ${media_player_id}
+            - logger.log:
+                level: INFO
+                format: "==== TOUCH CONTROL: Mute ON"
+
+      # ------------------------------------------------------
+      # ACTION 4 - Mute OFF
+      # ------------------------------------------------------
+      - if:
+          condition:
+            lambda: "return id(control_action_code) == 4;"
+          then:
+            - media_player.unmute: ${media_player_id}
+            - logger.log:
+                level: INFO
+                format: "==== TOUCH CONTROL: Mute OFF"
+
+      # ------------------------------------------------------
+      # ACTION 5 - Luminosità
+      # ------------------------------------------------------
+      - if:
+          condition:
+            lambda: "return id(control_action_code) == 5;"
+          then:
+            - light.turn_on:
+                id: ${display_backlight_id}
+                brightness: !lambda "return id(ui_brightness_level);"
+            - logger.log:
+                level: INFO
+                format: "==== TOUCH CONTROL: Brightness"
+
+      # ------------------------------------------------------
+      # ACTION 6 - Avvia Voice Assistant
+      # ------------------------------------------------------
+      - if:
+          condition:
+            lambda: "return id(control_action_code) == 6;"
+          then:
+            - micro_wake_word.stop:
+            - lambda: |-
+                id(${display_awake_until_id}) = millis() + 300000UL;
+                id(${voice_assistant_phase_global_id}) = ${voice_assist_waiting_for_command_phase_id};
+                id(${va_ultimo_input_ms_id}) = millis();
+
+            - if:
+                condition:
+                  lambda: "return id(${va_modalita_continua_id});"
+                then:
+                  - voice_assistant.start_continuous:
+                else:
+                  - voice_assistant.start:
+
+            - logger.log:
+                level: INFO
+                format: "==== TOUCH CONTROL: Voice Assistant START"
+
+      # ------------------------------------------------------
+      # ACTION 7 - Stop Voice Assistant
+      # ------------------------------------------------------
+      - if:
+          condition:
+            lambda: "return id(control_action_code) == 7;"
+          then:
+            - script.execute: ${script_va_stop_id}
+            - logger.log:
+                level: INFO
+                format: "==== TOUCH CONTROL: Voice Assistant STOP"
+
+      # ------------------------------------------------------
+      # ACTION 8 - Antifurto ON
+      # ------------------------------------------------------
+      - if:
+          condition:
+            lambda: "return id(control_action_code) == 8;"
+          then:
+            - switch.turn_on: ${antifurto_switch_id}
+            - logger.log:
+                level: INFO
+                format: "==== TOUCH CONTROL: Antifurto ON"
+
+      # ------------------------------------------------------
+      # ACTION 9 - Antifurto OFF
+      # ------------------------------------------------------
+      - if:
+          condition:
+            lambda: "return id(control_action_code) == 9;"
+          then:
+            - switch.turn_off: ${antifurto_switch_id}
+            - logger.log:
+                level: INFO
+                format: "==== TOUCH CONTROL: Antifurto OFF"
+
+      # ------------------------------------------------------
+      # Reset codice azione
+      # ------------------------------------------------------
+      - lambda: |-
+          id(control_action_code) = 0;
+
+      - component.update: ${display_id}
+
+
+
+      - component.update: ${display_id}
+
+    on_update:
+      - lambda: |-
+          const uint32_t now = millis();
+
+          bool redraw = false;
+
+          for (auto touch : touches) {
+            if (touch.state != 1 && touch.state != 2) {
+              continue;
+            }
+
+            id(${touch_x_id}) = touch.x;
+            id(${touch_y_id}) = touch.y;
+            id(${display_awake_until_id}) = now + 30000UL;
+
+            // ======================================================
+            // DISABILITA VECCHIO SLIDER VOLUME / FREEZE UI
+            // ======================================================
+            id(touch_volume_drag_active) = false;
+            id(touch_volume_slider_until) = 0;
+            id(touch_ui_freeze_until) = 0;
+
+            const int dx = touch.x - touch.x_org;
+            const int dy = touch.y - touch.y_org;
+
+            const int adx = std::abs(dx);
+
+            // Dai log:
+            // swipe up fisico = dy negativo
+            // esempio: dy=-149
+            const bool swipe_up =
+              dy < -65 &&
+              adx < 125;
+
+            const bool swipe_down =
+              dy > 65 &&
+              adx < 125;
+
+            if (now >= id(control_touch_cooldown_until)) {
+              // ======================================================
+              // SWIPE UP -> APRE PAGINA CONTROLLI
+              // ======================================================
+              if (swipe_up && !id(control_page_active)) {
+                id(control_page_active) = true;
+                id(control_page_until) = now + 15000UL;
+                id(control_touch_cooldown_until) = now + 900UL;
+                id(control_action_code) = 0;
+
+                ESP_LOGI(
+                  "touch_ui",
+                  "SWIPE UP -> pagina controlli ON dx=%d dy=%d",
+                  dx,
+                  dy
+                );
+
+                redraw = true;
+                break;
+              }
+
+              // ======================================================
+              // SWIPE DOWN -> CHIUDE PAGINA CONTROLLI
+              // ======================================================
+              if (swipe_down && id(control_page_active)) {
+                id(control_page_active) = false;
+                id(control_page_until) = 0;
+                id(control_touch_cooldown_until) = now + 900UL;
+                id(control_action_code) = 0;
+
+                ESP_LOGI(
+                  "touch_ui",
+                  "SWIPE DOWN -> pagina controlli OFF dx=%d dy=%d",
+                  dx,
+                  dy
+                );
+
+                redraw = true;
+                break;
+              }
+            }
+          }
+
+          if (redraw) {
+            id(${display_id}).update();
+          }
+          
+# ======================================================
+# DISPLAY
+# ======================================================
+display:
+  - platform: mipi_spi
+    id: ${display_id}
+    model: JC3636W518V2
+    spi_id: ${display_qspi_id}
+    bus_mode: quad
+
+    cs_pin: ${display_cs_pin}
+
+    reset_pin:
+      pca9554: ${io_expander_id}
+      number: ${display_reset_expander_pin}
+
+    dimensions:
+      width: 360
+      height: 360
+      offset_width: 0
+      offset_height: 0
+
+    rotation: 180
+    color_order: rgb
+    invert_colors: true
+    data_rate: 80MHz
+    buffer_size: 100%
+    auto_clear_enabled: false
+    update_interval: 50ms
+    color_depth: 16
+
+    lambda: |-
+      uint32_t now = millis();
+      const uint32_t real_now = now;
+
+      // ======================================================
+      // FREEZE ANIMAZIONI DURANTE DRAG SLIDER
+      // Non interrompe il disegno della faccina.
+      // Congela solo il tempo usato dalle animazioni.
+      // ======================================================
+      const bool touch_ui_freeze =
+        id(touch_volume_drag_active) ||
+        real_now < id(touch_ui_freeze_until);
+
+      static bool touch_ui_freeze_prev = false;
+      static uint32_t frozen_anim_now = 0;
+
+      if (touch_ui_freeze && !touch_ui_freeze_prev) {
+        frozen_anim_now = real_now;
+      }
+
+      touch_ui_freeze_prev = touch_ui_freeze;
+
+      if (touch_ui_freeze) {
+        now = frozen_anim_now;
+      } else {
+        now = real_now;
+      }
+      const int phase = id(${voice_assistant_phase_global_id});
+
+      auto clampi = [](int v, int lo, int hi) -> int {
+        if (v < lo) return lo;
+        if (v > hi) return hi;
+        return v;
+      };
+
+      auto X = [&](int x) -> int {
+        return clampi((x * 3 + 1) / 2, 0, 359);
+      };
+
+      auto Y = [&](int y) -> int {
+        return clampi((y * 3 + 1) / 2, 0, 359);
+      };
+
+      auto S = [&](int v) -> int {
+        int out = (v * 3 + 1) / 2;
+        return out < 1 ? 1 : out;
+      };
+
+      auto fill_screen = [&](Color c) {
+        it.fill(c);
+      };
+
+      auto filled_circle = [&](int x, int y, int r, Color c) {
+        it.filled_circle(X(x), Y(y), S(r), c);
+      };
+
+      auto circle = [&](int x, int y, int r, Color c) {
+        it.circle(X(x), Y(y), S(r), c);
+      };
+
+      auto filled_rectangle = [&](int x, int y, int w, int h, Color c) {
+        it.filled_rectangle(X(x), Y(y), S(w), S(h), c);
+      };
+
+      auto rectangle = [&](int x, int y, int w, int h, Color c) {
+        it.rectangle(X(x), Y(y), S(w), S(h), c);
+      };
+
+      auto line = [&](int x1, int y1, int x2, int y2, Color c) {
+        it.line(X(x1), Y(y1), X(x2), Y(y2), c);
+      };
+
+      auto clampf = [](float v, float lo, float hi) -> float {
+        if (v < lo) return lo;
+        if (v > hi) return hi;
+        return v;
+      };
+
+      auto smoothstep = [&](float x) -> float {
+        x = clampf(x, 0.0f, 1.0f);
+        return x * x * (3.0f - 2.0f * x);
+      };
+
+      auto lerpf = [](float a, float b, float t) -> float {
+        return a + (b - a) * t;
+      };
+
+      auto blend_color = [&](const Color &from, const Color &to, float t) -> Color {
+        t = clampf(t, 0.0f, 1.0f);
+        return Color(
+          (uint8_t)(from.red + (to.red - from.red) * t),
+          (uint8_t)(from.green + (to.green - from.green) * t),
+          (uint8_t)(from.blue + (to.blue - from.blue) * t)
+        );
+      };
+
+      const auto mp_state = id(${media_player_id}).state;
+      const bool announcement_playing =
+          mp_state == media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING;
+      const bool media_playing =
+          mp_state == media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING;
+
+      // ===== sleep / wake logic =====
+      static uint32_t last_interaction_ms = 0;
+      static int last_phase = -999;
+
+      if (last_interaction_ms == 0) last_interaction_ms = now;
+
+      const bool noise_wake_up    = id(${noise_detected_binary_sensor_id}).state;
+      const bool noise_keep_awake = noise_wake_up;
+      const bool media_or_tts_active =
+          media_playing || announcement_playing || id(${timer_ringing_switch_id}).state;
+
+      static bool prev_noise_wake_up = false;
+      const bool noise_wake_up_edge = noise_wake_up && !prev_noise_wake_up;
+      prev_noise_wake_up = noise_wake_up;
+
+      if (phase != last_phase) {
+        if (phase != ${voice_assist_idle_phase_id}) last_interaction_ms = now;
+        last_phase = phase;
+      }
+
+      if (phase != ${voice_assist_idle_phase_id}) last_interaction_ms = now;
+      if (media_or_tts_active || noise_keep_awake) last_interaction_ms = now;
+
+      const bool recently_awakened = (now < id(${display_awake_until_id}));
+
+      const bool would_sleep =
+          (phase == ${voice_assist_idle_phase_id}) &&
+          !recently_awakened &&
+          !media_or_tts_active &&
+          ((now - last_interaction_ms) > 6000UL);
+
+      if (noise_wake_up_edge) {
+        id(${display_awake_until_id}) = now + 30000UL;
+        if (would_sleep) id(${display_startled_until_id}) = now + 2200UL;
+        last_interaction_ms = now;
+      }
+
+      const bool sleeping =
+          (phase == ${voice_assist_idle_phase_id}) &&
+          !(now < id(${display_awake_until_id})) &&
+          !media_or_tts_active &&
+          !noise_keep_awake &&
+          ((now - last_interaction_ms) > 6000UL);
+
+      // ===== forced emotion =====
+      const int  emotion         = id(${display_emotion_mode_id});
+      const bool force_happy     = (emotion == 1);
+      const bool force_sleepy    = (emotion == 2);
+      const bool force_sad       = (emotion == 3);
+      const bool force_angry     = (emotion == 4);
+      const bool force_surprised = (emotion == 5);
+      const bool police_mode     = id(${antifurto_switch_id}).state;
+
+      // ===== music mode =====
+      const bool music_mode =
+          media_playing &&
+          !announcement_playing &&
+          phase != ${voice_assist_waiting_for_command_phase_id} &&
+          phase != ${voice_assist_listening_for_command_phase_id} &&
+          phase != ${voice_assist_thinking_phase_id} &&
+          phase != ${voice_assist_replying_phase_id};
+
+      const bool force_startled =
+          (now < id(${display_startled_until_id})) &&
+          !music_mode &&
+          !media_or_tts_active &&
+          phase != ${voice_assist_waiting_for_command_phase_id} &&
+          phase != ${voice_assist_listening_for_command_phase_id} &&
+          phase != ${voice_assist_thinking_phase_id} &&
+          phase != ${voice_assist_replying_phase_id};
+
+      // ===== audio level — calcolato PRIMA di tutto =====
+      float audio_level = 0.0f;
+      if (!std::isnan(id(playback_peak).state)) {
+        float db = id(playback_peak).state;
+        audio_level = clampf((db + 68.0f) / 33.0f, 0.0f, 1.0f);
+        if (db < -64.0f) audio_level = 0.0f;
+      }
+
+      // Due smoothing separati: attack rapido, decay lento
+      static float music_level_smooth = 0.0f;
+      {
+        float alpha = (audio_level > music_level_smooth) ? 0.75f : 0.18f;
+        music_level_smooth += (audio_level - music_level_smooth) * alpha;
+        if (!music_mode) music_level_smooth *= 0.85f;
+      }
+
+      const float vu = clampf(music_level_smooth, 0.0f, 1.0f);
+      const bool happy_mode = music_mode || force_happy;
+      const bool effective_sleeping = !music_mode && !force_startled && (sleeping || force_sleepy);
+
+      // ===== background =====
+      Color BG      = Color(10, 18, 70);
+      Color BG_GLOW = Color(10, 18, 70);
+      Color RING    = Color(25, 35, 90);
+
+      if (!music_mode) {
+        if (phase == ${voice_assist_waiting_for_command_phase_id} ||
+            phase == ${voice_assist_listening_for_command_phase_id}) {
+          BG = Color(0, 42, 90);
+        } else if (phase == ${voice_assist_thinking_phase_id}) {
+          BG = Color(38, 18, 88);
+        } else if (phase == ${voice_assist_replying_phase_id}) {
+          BG = Color(0, 55, 45);
+        } else if (phase == ${voice_assist_not_ready_phase_id}) {
+          BG = Color(42, 42, 52);
+        } else if (phase == ${voice_assist_error_phase_id}) {
+          BG = Color(95, 12, 22);
+        }
+
+        if (effective_sleeping) {
+          BG = Color(4, 8, 22);
+        } else if (force_happy) {
+          BG = Color(12, 40, 95);
+        } else if (force_sad) {
+          BG = Color(26, 30, 70);
+        } else if (force_angry) {
+          BG = Color(95, 16, 16);
+        } else if (force_surprised) {
+          BG = Color(0, 70, 95);
+        } else if (force_startled) {
+          BG = Color(42, 10, 70);
+        } else if (police_mode) {
+          BG = Color(8, 18, 70);
+        }
+
+      } else {
+        // ======================================================
+        // MUSIC BACKGROUND - MULTI COLOR CYCLE LEGATO AL VU
+        // Verde -> Acqua -> Ciano -> Blu -> Viola -> Magenta -> Rosso -> Arancio -> Verde
+        // La velocità della transizione aumenta con il VU meter.
+        // ======================================================
+        const uint32_t bg_dt_max = 90UL;
+
+        static uint32_t bg_last_ms = 0;
+        static float bg_phase = 0.0f;
+
+        static float bg_r = 6.0f;
+        static float bg_g = 42.0f;
+        static float bg_b = 22.0f;
+
+        static float bg_vu = 0.0f;
+        static float bg_last_vu = 0.0f;
+        static float bg_beat = 0.0f;
+
+        auto bg_clampf = [](float v, float lo, float hi) -> float {
+          if (v < lo) return lo;
+          if (v > hi) return hi;
+          return v;
+        };
+
+        auto bg_lerpf = [](float a, float b, float t) -> float {
+          return a + (b - a) * t;
+        };
+
+        auto bg_smoothstep = [&](float x) -> float {
+          x = bg_clampf(x, 0.0f, 1.0f);
+          return x * x * (3.0f - 2.0f * x);
+        };
+
+        if (bg_last_ms == 0) {
+          bg_last_ms = now;
+        }
+
+        uint32_t dt = now - bg_last_ms;
+        bg_last_ms = now;
+
+        // Anti-salto se un frame arriva in ritardo
+        if (dt > bg_dt_max) {
+          dt = bg_dt_max;
+        }
+
+        // ======================================================
+        // Smoothing VU per lo sfondo
+        // Lo spettro può essere nervoso, lo sfondo deve respirare.
+        // ======================================================
+        float vu_for_bg = bg_clampf(vu, 0.0f, 1.0f);
+
+        bg_vu += (vu_for_bg - bg_vu) * ((vu_for_bg > bg_vu) ? 0.12f : 0.045f);
+        bg_vu = bg_clampf(bg_vu, 0.0f, 1.0f);
+
+        // Beat morbido: non cambia colore di colpo,
+        // ma accelera per un attimo la rotazione.
+        float vu_delta = bg_vu - bg_last_vu;
+        bg_last_vu = bg_vu;
+
+        if (bg_vu > 0.52f && vu_delta > 0.035f) {
+          bg_beat = 1.0f;
+        } else {
+          bg_beat *= 0.88f;
+        }
+
+        // ======================================================
+        // Velocità ciclo colori legata al VU
+        // Silenzio: circa 55s per giro
+        // Forte: circa 12s per giro
+        // Beat: spinta temporanea
+        // ======================================================
+        float vu_curve = powf(bg_vu, 0.85f);
+
+        float cycle_ms = bg_lerpf(55000.0f, 12000.0f, vu_curve);
+
+        // Boost temporaneo sul beat
+        cycle_ms = cycle_ms / (1.0f + bg_beat * 0.65f);
+
+        // Avanzamento fase 0..1
+        bg_phase += (float)dt / cycle_ms;
+
+        while (bg_phase >= 1.0f) {
+          bg_phase -= 1.0f;
+        }
+
+        while (bg_phase < 0.0f) {
+          bg_phase += 1.0f;
+        }
+
+        // ======================================================
+        // Palette scura ma colorata
+        // ======================================================
+        const int palette_size = 8;
+
+        const float pr[palette_size] = {
+          6.0f,   // verde
+          4.0f,   // acqua
+          4.0f,   // ciano
+          6.0f,   // blu
+          34.0f,  // viola
+          62.0f,  // magenta
+          82.0f,  // rosso
+          76.0f   // arancio
+        };
+
+        const float pg[palette_size] = {
+          42.0f,  // verde
+          52.0f,  // acqua
+          44.0f,  // ciano
+          20.0f,  // blu
+          10.0f,  // viola
+          8.0f,   // magenta
+          8.0f,   // rosso
+          28.0f   // arancio
+        };
+
+        const float pb[palette_size] = {
+          22.0f,  // verde
+          44.0f,  // acqua
+          74.0f,  // ciano
+          88.0f,  // blu
+          92.0f,  // viola
+          76.0f,  // magenta
+          24.0f,  // rosso
+          8.0f    // arancio
+        };
+
+        // Posizione nel ciclo colore
+        float scaled = bg_phase * palette_size;
+        int idx = (int) scaled;
+
+        if (idx >= palette_size) {
+          idx = palette_size - 1;
+        }
+
+        int next_idx = idx + 1;
+
+        if (next_idx >= palette_size) {
+          next_idx = 0;
+        }
+
+        float local_t = scaled - idx;
+        local_t = bg_smoothstep(local_t);
+
+        // Colore base interpolato
+        float tr = bg_lerpf(pr[idx], pr[next_idx], local_t);
+        float tg = bg_lerpf(pg[idx], pg[next_idx], local_t);
+        float tb = bg_lerpf(pb[idx], pb[next_idx], local_t);
+
+        // ======================================================
+        // Luminosità legata al VU
+        // Non flasha: aumenta piano con volume/beat.
+        // ======================================================
+        float brightness_boost = 1.0f + bg_vu * 0.28f + bg_beat * 0.10f;
+
+        tr *= brightness_boost;
+        tg *= brightness_boost;
+        tb *= brightness_boost;
+
+        // Limite per restare elegante e ridurre tearing visibile
+        tr = bg_clampf(tr, 0.0f, 105.0f);
+        tg = bg_clampf(tg, 0.0f, 95.0f);
+        tb = bg_clampf(tb, 0.0f, 115.0f);
+
+        // ======================================================
+        // Smoothing finale RGB
+        // Più alto = colore segue più velocemente il VU
+        // ======================================================
+        const float color_alpha = 0.080f;
+
+        bg_r += (tr - bg_r) * color_alpha;
+        bg_g += (tg - bg_g) * color_alpha;
+        bg_b += (tb - bg_b) * color_alpha;
+
+        uint8_t r = (uint8_t) bg_clampf(bg_r, 0.0f, 255.0f);
+        uint8_t g = (uint8_t) bg_clampf(bg_g, 0.0f, 255.0f);
+        uint8_t b = (uint8_t) bg_clampf(bg_b, 0.0f, 255.0f);
+
+        BG = Color(r, g, b);
+
+        BG_GLOW = Color(
+          (uint8_t) bg_clampf((float) r + 5.0f + bg_vu * 8.0f, 0.0f, 255.0f),
+          (uint8_t) bg_clampf((float) g + 8.0f + bg_vu * 8.0f, 0.0f, 255.0f),
+          (uint8_t) bg_clampf((float) b + 14.0f + bg_vu * 10.0f, 0.0f, 255.0f)
+        );
+
+        RING = Color(
+          (uint8_t) bg_clampf((float) r + 12.0f + bg_vu * 10.0f, 0.0f, 255.0f),
+          (uint8_t) bg_clampf((float) g + 18.0f + bg_vu * 10.0f, 0.0f, 255.0f),
+          (uint8_t) bg_clampf((float) b + 26.0f + bg_vu * 12.0f, 0.0f, 255.0f)
+        );
+      }
+      fill_screen(BG);
+
+      // ======================================================
+      // CONTROL PAGE - SWIPE UP
+      // Schermo pulito: solo BG + cerchi touch
+      // ======================================================
+      if (id(control_page_active) && now > id(control_page_until)) {
+        id(control_page_active) = false;
+      }
+
+      if (id(control_page_active)) {
+        it.fill(BG);
+        const int cx = 180;
+        const int cy = 180;
+
+        auto clampf_local = [](float v, float lo, float hi) -> float {
+          if (v < lo) return lo;
+          if (v > hi) return hi;
+          return v;
+        };
+
+        auto mix_color = [&](Color a, Color b, float t) -> Color {
+          t = clampf_local(t, 0.0f, 1.0f);
+          return Color(
+            (uint8_t)(a.red   + (b.red   - a.red)   * t),
+            (uint8_t)(a.green + (b.green - a.green) * t),
+            (uint8_t)(a.blue  + (b.blue  - a.blue)  * t)
+          );
+        };
+
+        const Color BTN_BASE   = mix_color(BG, Color(255, 255, 255), 0.08f);
+        const Color BTN_BORDER = mix_color(BG, Color(255, 255, 255), 0.30f);
+        const Color BTN_TEXT   = Color(245, 250, 255);
+
+        const Color ACTIVE_GREEN = Color(0, 230, 140);
+        const Color ACTIVE_BLUE  = Color(0, 180, 255);
+        const Color ACTIVE_AMBER = Color(255, 185, 40);
+        const Color ACTIVE_RED   = Color(255, 70, 70);
+        const Color MUTED_GRAY   = Color(110, 120, 145);
+
+        auto draw_button = [&](int bx, int by, int br, const char *label, Color accent, bool active) {
+          Color fill = active ? mix_color(BG, accent, 0.30f) : BTN_BASE;
+          Color ring = active ? accent : BTN_BORDER;
+
+          it.filled_circle(bx, by, br, fill);
+
+          it.circle(bx, by, br, ring);
+          it.circle(bx, by, br - 1, ring);
+
+          if (active) {
+            it.circle(bx, by, br + 3, accent);
+          }
+
+          it.printf(
+            bx,
+            by,
+            id(${font_timer_small_id}),
+            BTN_TEXT,
+            TextAlign::CENTER,
+            "%s",
+            label
+          );
+        };
+
+        // Stato volume
+        float vol = clampf_local(id(${media_player_id}).volume, 0.0f, 1.0f);
+
+        // Stato VA
+        bool va_running = id(${voice_assistant_id}).is_running();
+
+        // Stato antifurto
+        bool alarm_on = id(${antifurto_switch_id}).state;
+
+        // Stato luminosità
+        float bright = clampf_local(id(ui_brightness_level), 0.0f, 1.0f);
+
+        // ======================================================
+        // CERCHI TOUCH
+        // ======================================================
+
+        // Luminosità
+        draw_button(
+          180,
+          75,
+          44,
+          "LUX",
+          ACTIVE_AMBER,
+          bright > 0.70f
+        );
+
+        // Volume -
+        draw_button(
+          80,
+          150,
+          44,
+          "VOL-",
+          ACTIVE_BLUE,
+          false
+        );
+
+        // Voice Assistant centrale
+        draw_button(
+          180,
+          180,
+          50,
+          va_running ? "STOP" : "VA",
+          ACTIVE_GREEN,
+          va_running
+        );
+
+        // Volume +
+        draw_button(
+          280,
+          150,
+          44,
+          "VOL+",
+          ACTIVE_BLUE,
+          false
+        );
+
+        // Mute
+        draw_button(
+          80,
+          255,
+          44,
+          id(ui_media_muted) ? "MUTO" : "MUTE",
+          id(ui_media_muted) ? MUTED_GRAY : ACTIVE_GREEN,
+          id(ui_media_muted)
+        );
+
+        // Antifurto
+        draw_button(
+          280,
+          255,
+          44,
+          alarm_on ? "ALARM" : "SAFE",
+          alarm_on ? ACTIVE_RED : ACTIVE_GREEN,
+          alarm_on
+        );
+
+        // Mini indicatore volume, discreto, vicino al bordo
+        const int vr1 = 158;
+        const int vr2 = 169;
+
+        for (int deg = 205; deg <= 335; deg += 4) {
+          float a = deg * 0.01745329252f;
+          it.line(
+            cx + (int)(cosf(a) * vr1),
+            cy + (int)(sinf(a) * vr1),
+            cx + (int)(cosf(a) * vr2),
+            cy + (int)(sinf(a) * vr2),
+            mix_color(BG, Color(255, 255, 255), 0.16f)
+          );
+        }
+
+        int vol_sweep = (int)(vol * 130.0f);
+        for (int deg = 205; deg <= 205 + vol_sweep; deg += 4) {
+          float a = deg * 0.01745329252f;
+          it.line(
+            cx + (int)(cosf(a) * vr1),
+            cy + (int)(sinf(a) * vr1),
+            cx + (int)(cosf(a) * vr2),
+            cy + (int)(sinf(a) * vr2),
+            ACTIVE_BLUE
+          );
+        }
+
+        return;
+      }
+
+      // ===== colori faccia =====
+      const Color WHITE      = Color(255, 255, 255);
+      const Color EYE_WHITE  = Color(245, 245, 245);
+      const Color EYE_SHADOW = Color(180, 180, 180);
+      const Color IRIS_DARK  = Color(25, 95, 210);
+      const Color IRIS_MID   = Color(40, 150, 255);
+      const Color IRIS_LIGHT = Color(150, 225, 255);
+      const Color PUPIL      = Color(0, 0, 0);
+      const Color LIP_DARK   = Color(70, 20, 30);
+      const Color LIP_LIGHT  = Color(255, 170, 185);
+      const Color MOUTH_IN   = Color(18, 8, 10);
+      const Color TONGUE     = Color(230, 90, 120);
+      const Color TONGUE_L   = Color(255, 150, 170);
+      const Color SLEEP_Z    = Color(180, 210, 255);
+
+      // =================================================================
+      // VOLUME BAR
+      // =================================================================
+      auto draw_volume_bar = [&]() {
+        if (now >= id(${volume_bar_until_id})) return;
+
+        float vol_pct = clampf(id(${media_player_id}).volume, 0.0f, 1.0f);
+
+        Color VBG = Color(24, 36, 72);
+        Color VFG = Color(0, 220, 120);
+
+        if (vol_pct >= 0.70f) VFG = Color(255, 185, 0);
+
+        if (vol_pct >= 0.90f) {
+          float pulse = 0.65f + 0.35f * ((sinf(now / 120.0f) + 1.0f) * 0.5f);
+          VFG = Color(
+            (uint8_t)(255 * pulse),
+            (uint8_t)(70 * pulse),
+            (uint8_t)(20 * pulse)
+          );
+        }
+
+        const int cxv = 120;
+        const int cyv = 120;
+
+        // Dopo la scala 1.5x:
+        // 112 -> 168 px
+        // 119 -> 178/179 px
+        // quindi siamo praticamente sul bordo del display rotondo.
+        const int r_inner = 112;
+        const int r_outer = 119;
+
+        auto draw_vol_bar_line = [&](int deg, Color c) {
+          float a = ((float) deg) * 0.01745329252f;
+
+          line(
+            (int)(cxv + cosf(a) * r_inner),
+            (int)(cyv + sinf(a) * r_inner),
+            (int)(cxv + cosf(a) * r_outer),
+            (int)(cyv + sinf(a) * r_outer),
+            c
+          );
+
+          line(
+            (int)(cxv + cosf(a) * (r_inner + 1)),
+            (int)(cyv + sinf(a) * (r_inner + 1)),
+            (int)(cxv + cosf(a) * (r_outer - 1)),
+            (int)(cyv + sinf(a) * (r_outer - 1)),
+            c
+          );
+        };
+
+        for (int deg = -62; deg <= 62; deg += 2) {
+          draw_vol_bar_line(deg, VBG);
+        }
+
+        const int sweep = (int)(vol_pct * 124.0f + 0.5f);
+
+        for (int s = 0; s <= sweep; s += 2) {
+          draw_vol_bar_line(62 - s, VFG);
+        }
+
+        draw_vol_bar_line(62 - sweep, VFG);
+      };
+
+      // =================================================================
+      // TIMER ARC
+      // =================================================================
+      const bool timer_visible = (id(${va_timer_total_seconds_id}) > 0);
+
+      if (timer_visible) {
+        uint32_t left = id(${va_timer_seconds_left_id});
+
+        if (id(${va_timer_active_display_id}) &&
+            id(${va_timer_last_tick_ms_id}) > 0 &&
+            now > id(${va_timer_last_tick_ms_id})) {
+          uint32_t el = (now - id(${va_timer_last_tick_ms_id})) / 1000UL;
+          left = (el >= left) ? 0 : (left - el);
+        }
+
+        uint32_t total = id(${va_timer_total_seconds_id});
+        if (total == 0) total = 1;
+
+        float pct_left = clampf((float) left / (float) total, 0.0f, 1.0f);
+
+        Color TIMER_BG = Color(24, 36, 72);
+        Color TIMER_FG = Color(0, 220, 120);
+
+        if (!id(${va_timer_active_display_id})) {
+          TIMER_FG = Color(100, 150, 230);
+        } else if (pct_left <= 0.50f) {
+          TIMER_FG = Color(255, 185, 0);
+        }
+
+        if (id(${va_timer_active_display_id}) && pct_left <= 0.20f) {
+          float pulse = 0.65f + 0.35f * ((sinf(now / 120.0f) + 1.0f) * 0.5f);
+          TIMER_FG = Color((uint8_t)(255 * pulse), (uint8_t)(70 * pulse), (uint8_t)(20 * pulse));
+        }
+
+        Color INNER_BG = Color(
+          (uint8_t)((BG.red * 2 + 30) / 3),
+          (uint8_t)((BG.green * 2 + 30) / 3),
+          (uint8_t)((BG.blue * 2 + 30) / 3)
+        );
+
+        const int cx = 120;
+        const int cy = 120;
+
+        // Timer vicino al bordo esterno del 360x360.
+        // Con scala 1.5x: r_mid 114 -> 171 px.
+        // Il dot da 3 diventa circa 5 px, quindi resta dentro il cerchio.
+        const int r_mid = 114;
+        const int dot_r = 3;
+        const int step_deg = 3;
+
+        const int sweep_deg = (int)(pct_left * 360.0f + 0.5f);
+
+        filled_circle(cx, cy, 82, INNER_BG);
+
+        auto draw_timer_dot = [&](int deg, Color c) {
+          float a = ((float) deg) * 0.01745329252f;
+          filled_circle(
+            (int)(cx + cosf(a) * r_mid),
+            (int)(cy + sinf(a) * r_mid),
+            dot_r,
+            c
+          );
+        };
+
+        for (int deg = -90; deg < 270; deg += step_deg) {
+          draw_timer_dot(deg, TIMER_BG);
+        }
+
+        for (int i = 0; i <= sweep_deg; i += step_deg) {
+          draw_timer_dot(-90 + i, TIMER_FG);
+        }
+
+        draw_timer_dot(-90 + sweep_deg, TIMER_FG);
+
+        circle(cx, cy, 83, TIMER_BG);
+
+        char time_buf[16];
+
+        if (left >= 3600UL) {
+          snprintf(
+            time_buf,
+            sizeof(time_buf),
+            "%lu:%02lu:%02lu",
+            (unsigned long)(left / 3600UL),
+            (unsigned long)((left % 3600UL) / 60UL),
+            (unsigned long)(left % 60UL)
+          );
+        } else {
+          snprintf(
+            time_buf,
+            sizeof(time_buf),
+            "%02lu:%02lu",
+            (unsigned long)(left / 60UL),
+            (unsigned long)(left % 60UL)
+          );
+        }
+
+        it.printf(
+          X(cx),
+          Y(78),
+          id(${font_timer_small_id}),
+          Color(190, 210, 255),
+          TextAlign::CENTER,
+          id(${va_timer_active_display_id}) ? "TIMER" : "TIMER PAUSED"
+        );
+
+        it.printf(
+          X(cx),
+          Y(118),
+          id(${font_timer_big_id}),
+          WHITE,
+          TextAlign::CENTER,
+          "%s",
+          time_buf
+        );
+
+        if (!id(${va_timer_name_display_id}).empty()) {
+          std::string label = id(${va_timer_name_display_id});
+          if (label.length() > 22) label = label.substr(0, 22) + "...";
+
+          it.printf(
+            X(cx),
+            Y(152),
+            id(${font_timer_small_id}),
+            Color(170, 190, 230),
+            TextAlign::CENTER,
+            "%s",
+            label.c_str()
+          );
+        }
+
+        draw_volume_bar();
+        return;
+      }
+
+      // =================================================================
+      // FISICA OCCHI
+      // =================================================================
+      float tx = 0.0f;
+      float ty = 0.0f;
+
+      static uint32_t next_move = 0;
+      static float rtx = 0.0f;
+      static float rty = 0.0f;
+
+      if (!effective_sleeping) {
+        if (music_mode) {
+          tx = 0.14f * sinf(now / 420.0f);
+          ty = -0.10f;
+        } else if (force_happy) {
+          tx = 0.0f;
+          ty = -0.08f;
+        } else if (force_sad) {
+          tx = 0.0f;
+          ty = 0.10f;
+        } else if (force_angry) {
+          tx = 0.0f;
+          ty = -0.04f;
+        } else if (force_surprised) {
+          tx = 0.0f;
+          ty = -0.20f;
+        } else if (police_mode) {
+          tx = 0.0f;
+          ty = -0.06f;
+        } else if (phase == ${voice_assist_idle_phase_id}) {
+          if (next_move == 0) next_move = now + 700;
+
+          if (now >= next_move) {
+            static uint32_t rng = 0xA5A5A5A5;
+
+            rng = rng * 1664525UL + 1013904223UL;
+            rtx = ((int)(rng % 200) - 100) / 100.0f * 0.55f;
+
+            rng = rng * 1664525UL + 1013904223UL;
+            rty = ((int)(rng % 140) - 70) / 100.0f * 0.35f;
+
+            rng = rng * 1664525UL + 1013904223UL;
+            next_move = now + 700 + (rng % 1400);
+          }
+
+          tx = rtx;
+          ty = rty;
+
+        } else if (phase == ${voice_assist_listening_for_command_phase_id} ||
+                   phase == ${voice_assist_waiting_for_command_phase_id}) {
+          tx = 0.0f;
+          ty = -0.18f;
+
+        } else if (phase == ${voice_assist_thinking_phase_id}) {
+          tx = 0.55f * sinf(now / 350.0f);
+          ty = -0.06f;
+
+        } else if (phase == ${voice_assist_replying_phase_id}) {
+          tx = 0.18f * sinf(now / 280.0f);
+          ty = -0.04f;
+
+        } else if (phase == ${voice_assist_error_phase_id} ||
+                   phase == ${voice_assist_not_ready_phase_id}) {
+          tx = 0.0f;
+          ty = 0.10f;
+        }
+      }
+
+      static uint32_t last_ms = 0;
+      float dt = 0.05f;
+
+      if (last_ms != 0) {
+        dt = (now - last_ms) / 1000.0f;
+        dt = clampf(dt, 0.01f, 0.12f);
+      }
+
+      last_ms = now;
+
+      static float ex = 0.0f;
+      static float evx = 0.0f;
+      static float ey = 0.0f;
+      static float evy = 0.0f;
+
+      const float K = effective_sleeping ? 8.0f : 18.0f;
+      const float D = effective_sleeping ? 14.0f : 11.0f;
+
+      evx += (tx - ex) * K * dt;
+      evy += (ty - ey) * K * dt;
+
+      evx /= (1.0f + D * dt);
+      evy /= (1.0f + D * dt);
+
+      ex += evx * dt;
+      ey += evy * dt;
+
+      ex = clampf(ex, -1.0f, 1.0f);
+      ey = clampf(ey, -1.0f, 1.0f);
+
+      static float px = 0.0f;
+      static float pvx = 0.0f;
+      static float py = 0.0f;
+      static float pvy = 0.0f;
+
+      pvx += (ex * 1.10f - px) * 24.0f * dt;
+      pvy += (ey * 1.10f - py) * 24.0f * dt;
+
+      pvx /= (1.0f + 12.0f * dt);
+      pvy /= (1.0f + 12.0f * dt);
+
+      px += pvx * dt;
+      py += pvy * dt;
+
+      px = clampf(px, -1.0f, 1.0f);
+      py = clampf(py, -0.8f, 0.8f);
+
+      // =================================================================
+      // BLINK
+      // =================================================================
+      static bool blinking = false;
+      static uint32_t blink_start = 0;
+      static uint32_t next_blink = 0;
+      static float blink = 0.0f;
+
+      uint32_t blink_min = 2200;
+      uint32_t blink_max = 4500;
+
+      if (phase == ${voice_assist_listening_for_command_phase_id}) {
+        blink_min = 3200;
+        blink_max = 6500;
+      } else if (phase == ${voice_assist_thinking_phase_id}) {
+        blink_min = 1600;
+        blink_max = 3200;
+      }
+
+      bool freeze_blink =
+          effective_sleeping ||
+          phase == ${voice_assist_not_ready_phase_id} ||
+          phase == ${voice_assist_error_phase_id};
+
+      if (freeze_blink) {
+        blinking = false;
+        blink = 0.0f;
+        next_blink = now + 999999UL;
+      } else {
+        if (next_blink == 0) next_blink = now + blink_min;
+
+        if (!blinking && now >= next_blink) {
+          blinking = true;
+          blink_start = now;
+        }
+
+        if (blinking) {
+          uint32_t t = now - blink_start;
+
+          if (t <= 80) {
+            blink = smoothstep(t / 80.0f);
+          } else if (t <= 180) {
+            blink = 1.0f - smoothstep((t - 80) / 100.0f);
+          } else {
+            blink = 0.0f;
+            blinking = false;
+
+            static uint32_t rng2 = 0x12345678;
+            rng2 = rng2 * 1664525UL + 1013904223UL;
+
+            next_blink = now + blink_min + (rng2 % (blink_max - blink_min + 1));
+          }
+        }
+      }
+      // =================================================================
+      // HEAD BOB + DANCE
+      // =================================================================
+      int bob_x = effective_sleeping ? 0 : (int)(sinf(now / 900.0f) * 1.5f);
+      int bob_y = effective_sleeping ? (int)(sinf(now / 1600.0f) * 1.0f) : (int)(cosf(now / 1100.0f) * 1.5f);
+
+      int dance_x = 0;
+      int dance_y = 0;
+      int dance_left_y = 0;
+      int dance_right_y = 0;
+
+      if (music_mode) {
+        float level = vu;
+        float beat_fast = sinf(now / 120.0f);
+        float beat_side = sinf(now / 260.0f + 0.8f);
+        float beat_alt  = sinf(now / 190.0f + 1.7f);
+
+        dance_x = (int)(beat_side * (3.0f + level * 9.0f));
+        dance_y = (int)(fabsf(beat_fast) * (3.0f + level * 13.0f)) - 2;
+
+        dance_left_y  = (int)(beat_alt * (1.5f + level * 5.0f));
+        dance_right_y = (int)(-beat_alt * (1.5f + level * 5.0f));
+      }
+
+      // =================================================================
+      // DRAW HELPERS
+      // =================================================================
+      auto draw_curve = [&](int mx, int my, int half_w, float amp, Color col, int thick) {
+        if (half_w < 1) return;
+
+        for (int x = -half_w; x <= half_w; x++) {
+          float t = x / (float) half_w;
+          int yy = my + (int)(amp * (1.0f - t * t));
+
+          for (int k = -thick / 2; k <= thick / 2; k++) {
+            filled_circle(mx + x, yy + k, 1, col);
+          }
+        }
+      };
+
+      auto draw_z = [&](int x, int y, int s, Color col) {
+        int w = 8 * s;
+        int h = 10 * s;
+        int t = s;
+
+        for (int i = 0; i < t; i++) {
+          line(x, y + i, x + w, y + i, col);
+          line(x, y + h - i, x + w, y + h - i, col);
+          line(x + w - i, y, x + i, y + h, col);
+        }
+      };
+
+      auto draw_sleep_zzz = [&]() {
+        uint32_t t = now % 2600UL;
+
+        for (int i = 0; i < 3; i++) {
+          uint32_t local = (t + i * 850UL) % 2600UL;
+          float p = local / 2600.0f;
+
+          int zy = 150 - (int)(p * 78.0f);
+          int zx = 154 + (int)(p * 12.0f) + i * 8;
+
+          Color zc =
+            (p > 0.88f) ? Color(70, 95, 150) :
+            (p > 0.72f) ? Color(120, 150, 210) :
+                           SLEEP_Z;
+
+          draw_z(zx, zy, 1 + i, zc);
+        }
+      };
+
+      auto draw_music_note = [&](int x, int y, int s, Color col) {
+        int r = 3 * s;
+        int dx = 6 * s;
+        int h = 16 * s;
+
+        filled_circle(x, y, r, col);
+        filled_circle(x + dx, y - 2 * s, r, col);
+
+        for (int i = 0; i < s; i++) {
+          line(x + r + i, y - r, x + r + i, y - h, col);
+          line(x + dx + r + i, y - 2 * s - r, x + dx + r + i, y - h - 2 * s, col);
+        }
+
+        for (int i = 0; i < s; i++) {
+          line(x + r, y - h + i, x + dx + r, y - h - 2 * s + i, col);
+        }
+      };
+
+      auto draw_capsule = [&](int x, int y, int w, int h, Color col) {
+        if (w < 2) w = 2;
+        if (h < 2) h = 2;
+
+        int r = h / 2;
+        if (r < 1) r = 1;
+
+        int body_w = w - (r * 2);
+        if (body_w < 1) body_w = 1;
+
+        filled_rectangle(x + r, y, body_w, h, col);
+        filled_circle(x + r, y + r, r, col);
+        filled_circle(x + w - r - 1, y + r, r, col);
+      };
+
+      auto draw_touch_volume_slider = [&]() {
+        float vol = clampf(id(${media_player_id}).volume, 0.0f, 1.0f);
+
+        const int slider_x = 48;
+        const int slider_y = 172;
+        const int slider_w = 144;
+        const int slider_h = 4;
+
+        int fill_w = (int)(slider_w * vol + 0.5f);
+        if (fill_w < 0) fill_w = 0;
+        if (fill_w > slider_w) fill_w = slider_w;
+
+        Color panel_col = Color(4, 8, 22);
+        Color track_col = Color(22, 34, 70);
+        Color fill_col  = Color(0, 220, 140);
+        Color knob_col  = Color(245, 250, 255);
+        Color ring_col  = Color(90, 180, 255);
+
+        if (vol >= 0.70f) {
+          fill_col = Color(255, 185, 0);
+        }
+
+        if (vol >= 0.90f) {
+          fill_col = Color(255, 70, 20);
+        }
+
+        // Piccolo fondino SOLO dietro lo slider.
+        // Serve a cancellare la posizione precedente del knob,
+        // ma non svuota tutta la schermata.
+        draw_capsule(
+          slider_x - 12,
+          slider_y - 10,
+          slider_w + 24,
+          28,
+          panel_col
+        );
+
+        // Track sottile
+        draw_capsule(
+          slider_x,
+          slider_y,
+          slider_w,
+          slider_h,
+          track_col
+        );
+
+        // Riempimento
+        if (fill_w > 1) {
+          draw_capsule(
+            slider_x,
+            slider_y,
+            fill_w,
+            slider_h,
+            fill_col
+          );
+        }
+
+        // Knob piccolo
+        int knob_x = slider_x + fill_w;
+        if (knob_x < slider_x) knob_x = slider_x;
+        if (knob_x > slider_x + slider_w) knob_x = slider_x + slider_w;
+
+        filled_circle(knob_x, slider_y + slider_h / 2, 5, knob_col);
+        circle(knob_x, slider_y + slider_h / 2, 6, ring_col);
+
+        // Percentuale piccola, sotto lo slider
+        it.printf(
+          X(120),
+          Y(slider_y + 14),
+          id(${font_timer_small_id}),
+          Color(160, 220, 255),
+          TextAlign::CENTER,
+          "%.0f%%",
+          vol * 100.0f
+        );
+      };
+
+      // ======================================================
+      // ANALIZZATORE AUDIO CIRCOLARE "FAKE STEREO MIRROR"
+      // Metà destra calcolata, metà sinistra specchiata.
+      // Le barre partono dall'esterno e crescono verso l'interno.
+      // ======================================================
+      auto draw_circular_spectrum = [&](float vu_level) {
+        const int cx = 180;
+        const int cy = 180;
+
+        // Numero barre per lato.
+        // Totale visivo = half_bars * 2
+        const int half_bars = 38;
+
+        // Bordo esterno fisso.
+        // 166 è vicino al bordo del cerchio 360x360, ma resta dentro il display.
+        const int r_outer = 166;
+
+        // Altezza minima e massima verso il centro.
+        const int r_min = 4;
+        const int r_max = 34;
+
+        static float bins[38];
+        static float peaks[38];
+
+        auto cs_clampf = [](float v, float lo, float hi) -> float {
+          if (v < lo) return lo;
+          if (v > hi) return hi;
+          return v;
+        };
+
+        auto cs_hsv_to_rgb = [&](float h, float s, float v) -> Color {
+          h = fmodf(h, 360.0f);
+          if (h < 0) h += 360.0f;
+
+          s = cs_clampf(s, 0.0f, 1.0f);
+          v = cs_clampf(v, 0.0f, 1.0f);
+
+          float c = v * s;
+          float x = c * (1.0f - fabsf(fmodf(h / 60.0f, 2.0f) - 1.0f));
+          float m = v - c;
+
+          float r = 0.0f;
+          float g = 0.0f;
+          float b = 0.0f;
+
+          if (h < 60.0f) {
+            r = c;
+            g = x;
+            b = 0.0f;
+          } else if (h < 120.0f) {
+            r = x;
+            g = c;
+            b = 0.0f;
+          } else if (h < 180.0f) {
+            r = 0.0f;
+            g = c;
+            b = x;
+          } else if (h < 240.0f) {
+            r = 0.0f;
+            g = x;
+            b = c;
+          } else if (h < 300.0f) {
+            r = x;
+            g = 0.0f;
+            b = c;
+          } else {
+            r = c;
+            g = 0.0f;
+            b = x;
+          }
+
+          return Color(
+            (uint8_t)((r + m) * 255.0f),
+            (uint8_t)((g + m) * 255.0f),
+            (uint8_t)((b + m) * 255.0f)
+          );
+        };
+
+        auto draw_bar = [&](float a, float value, float peak, Color col) {
+          value = cs_clampf(value, 0.0f, 1.0f);
+          peak  = cs_clampf(peak,  0.0f, 1.0f);
+
+          int bar_h = r_min + (int)(value * r_max);
+
+          // ======================================================
+          // Barra dall'esterno verso l'interno
+          // ======================================================
+          int r1 = r_outer;
+          int r2 = r_outer - bar_h;
+
+          int x1 = cx + (int)(cosf(a) * r1);
+          int y1 = cy + (int)(sinf(a) * r1);
+          int x2 = cx + (int)(cosf(a) * r2);
+          int y2 = cy + (int)(sinf(a) * r2);
+
+          it.line(x1, y1, x2, y2, col);
+
+          // Spessore barra: linee leggermente sfalsate in angolo.
+          float a2 = a + 0.0075f;
+          it.line(
+            cx + (int)(cosf(a2) * r1),
+            cy + (int)(sinf(a2) * r1),
+            cx + (int)(cosf(a2) * r2),
+            cy + (int)(sinf(a2) * r2),
+            col
+          );
+
+          float a3 = a - 0.0075f;
+          it.line(
+            cx + (int)(cosf(a3) * r1),
+            cy + (int)(sinf(a3) * r1),
+            cx + (int)(cosf(a3) * r2),
+            cy + (int)(sinf(a3) * r2),
+            col
+          );
+
+          // Peak luminoso sulla punta interna.
+          if (vu_level > 0.05f) {
+            int peak_h = r_min + (int)(peak * r_max);
+            int peak_r = r_outer - peak_h - 2;
+
+            int px = cx + (int)(cosf(a) * peak_r);
+            int py = cy + (int)(sinf(a) * peak_r);
+
+            it.filled_circle(px, py, 2, col);
+          }
+        };
+
+        // Piccolo anello guida esterno, molto leggero.
+        // Se non lo vuoi, puoi commentare queste due righe.
+        it.circle(cx, cy, r_outer + 1, Color(35, 60, 80));
+        it.circle(cx, cy, r_outer,     Color(15, 28, 45));
+
+        for (int i = 0; i < half_bars; i++) {
+          float t = i / (float)(half_bars - 1);
+
+          // ======================================================
+          // Metà destra:
+          // -90° alto, 0° destra, +90° basso
+          // ======================================================
+          float a_right = -1.5707963f + t * 3.1415926f;
+
+          // Mirror sulla metà sinistra rispetto all'asse verticale.
+          float a_left = 3.1415926f - a_right;
+
+          // Movimento pseudo-spettro.
+          float wave1 = (sinf(now / 170.0f + i * 0.42f) + 1.0f) * 0.5f;
+          float wave2 = (sinf(now / 390.0f + i * 0.91f) + 1.0f) * 0.5f;
+          float wave3 = (sinf(now / 95.0f  + i * 0.23f) + 1.0f) * 0.5f;
+
+          // Sagoma: un po' più energia al centro del lato,
+          // meno alle estremità alto/basso.
+          float center_boost = 1.0f - fabsf((t - 0.5f) * 2.0f);
+          center_boost = 0.45f + center_boost * 0.55f;
+
+          float target =
+            vu_level *
+            center_boost *
+            (0.35f + wave1 * 0.30f + wave2 * 0.22f + wave3 * 0.13f);
+
+          target = cs_clampf(target, 0.0f, 1.0f);
+
+          // Attack veloce, decay lento.
+          float alpha = target > bins[i] ? 0.58f : 0.15f;
+          bins[i] += (target - bins[i]) * alpha;
+          bins[i] = cs_clampf(bins[i], 0.0f, 1.0f);
+
+          if (bins[i] > peaks[i]) {
+            peaks[i] = bins[i];
+          } else {
+            peaks[i] *= 0.94f;
+          }
+
+          // Colore stile cyan/viola/rosa, più luminoso quando sale.
+          float hue = fmodf(185.0f + t * 105.0f + now * 0.030f, 360.0f);
+          float val = 0.32f + bins[i] * 0.68f;
+
+          Color col = cs_hsv_to_rgb(hue, 0.88f, val);
+
+          // Destra.
+          draw_bar(a_right, bins[i], peaks[i], col);
+
+          // Sinistra specchiata.
+          draw_bar(a_left, bins[i], peaks[i], col);
+        }
+      };
+
+      // =================================================================
+      // DRAW EYE
+      // =================================================================
+      auto draw_eye = [&](int cx, int cy, bool is_left) {
+        int eye_r = 30;
+
+        if (force_startled) eye_r = 36;
+        else if (happy_mode) eye_r = 31;
+        else if (force_sad) eye_r = 29;
+        else if (force_surprised) eye_r = 34;
+
+        if (effective_sleeping) {
+          draw_curve(cx, cy + 6, 16, 4.0f, Color(130, 145, 190), 4);
+          draw_curve(cx, cy + 5, 15, 3.0f, Color(235, 235, 245), 2);
+          return;
+        }
+
+        filled_circle(cx + 3, cy + 5, eye_r + 1, Color(25, 25, 25));
+        filled_circle(cx, cy, eye_r, EYE_WHITE);
+        filled_circle(cx, cy - 11, eye_r - 10, EYE_SHADOW);
+        filled_circle(cx, cy + 4, eye_r - 5, EYE_WHITE);
+        circle(cx, cy, eye_r, Color(210, 210, 210));
+
+        const int iris_r = 17;
+        const int pupil_r = 8;
+        const int max_off = eye_r - iris_r - 6;
+
+        int ox = (int)(px * max_off) + (is_left ? -1 : 1);
+        int oy = (int)(py * max_off);
+
+        int ix = cx + ox;
+        int iy = cy + oy;
+
+        filled_circle(ix, iy, iris_r, IRIS_DARK);
+        filled_circle(ix - 2, iy - 2, iris_r - 4, IRIS_MID);
+        filled_circle(ix - 4, iy - 5, iris_r - 10, IRIS_LIGHT);
+        filled_circle(ix + 1, iy + 1, pupil_r + 1, Color(10, 10, 10));
+        filled_circle(ix + 1, iy + 1, pupil_r, PUPIL);
+        filled_circle(ix - 5, iy - 6, 4, WHITE);
+        filled_circle(ix - 10, iy - 11, 2, WHITE);
+        filled_circle(ix + 4, iy + 7, 1, Color(180, 180, 180));
+
+        float upper_expr = 0.0f;
+        float lower_expr = 0.0f;
+
+        if (music_mode) {
+          upper_expr = 1.0f;
+        } else if (force_happy) {
+          upper_expr = 0.0f;
+        } else if (force_sad) {
+          upper_expr = 8.0f;
+          lower_expr = 5.0f;
+        } else if (force_angry) {
+          upper_expr = 10.0f;
+          lower_expr = 2.0f;
+        } else if (force_startled || force_surprised) {
+          upper_expr = 0.0f;
+        } else if (phase == ${voice_assist_waiting_for_command_phase_id} ||
+                   phase == ${voice_assist_listening_for_command_phase_id}) {
+          upper_expr = 1.0f;
+        } else if (phase == ${voice_assist_thinking_phase_id}) {
+          upper_expr = 4.0f;
+        } else if (phase == ${voice_assist_replying_phase_id}) {
+          upper_expr = 2.0f;
+        } else if (phase == ${voice_assist_error_phase_id} ||
+                   phase == ${voice_assist_not_ready_phase_id}) {
+          upper_expr = 18.0f;
+          lower_expr = 7.0f;
+        }
+
+        float upper = upper_expr + blink * 44.0f;
+        float lower = lower_expr + blink * 18.0f;
+
+        if (upper > 0.0f) {
+          filled_circle(cx, cy - eye_r - 16 + (int) upper, eye_r + 16, BG);
+        }
+
+        if (lower > 0.0f) {
+          filled_circle(cx, cy + eye_r + 16 - (int) lower, eye_r + 16, BG);
+        }
+      };
+
+      // =================================================================
+      // DRAW MOUTH
+      // =================================================================
+      auto draw_mouth = [&](int mx, int my) {
+        if (effective_sleeping) {
+          draw_capsule(mx - 14, my - 3, 28, 6, LIP_DARK);
+          draw_curve(mx, my - 2, 12, 1.8f, LIP_LIGHT, 1);
+          draw_curve(mx, my + 1, 10, 0.0f, MOUTH_IN, 1);
+          return;
+        }
+
+        if (police_mode) {
+          draw_capsule(mx - 16, my - 4, 32, 7, LIP_DARK);
+          draw_curve(mx, my + 1, 14, -1.2f, LIP_DARK, 3);
+          draw_curve(mx, my, 12, -0.4f, LIP_LIGHT, 1);
+          return;
+        }
+
+        if (force_startled) {
+          int shake = (int)(sinf(now / 28.0f) * 2.0f);
+
+          draw_capsule(mx - 12 + shake, my - 14, 24, 30, LIP_DARK);
+          draw_capsule(mx - 7 + shake, my - 9, 14, 20, MOUTH_IN);
+
+          filled_circle(mx - 3 + shake, my - 6, 1, LIP_LIGHT);
+          filled_circle(mx + 3 + shake, my - 6, 1, LIP_LIGHT);
+          return;
+        }
+
+        if (music_mode) {
+          float sing = vu;
+          if (sing < 0.08f) sing = (sinf(now / 220.0f) + 1.0f) * 0.5f * 0.25f;
+
+          float amp = 3.0f + sing * 9.0f;
+
+          draw_capsule(mx - 19, my - 4, 38, 9, LIP_DARK);
+          draw_curve(mx, my - 2, 18, amp, LIP_DARK, 3);
+          draw_curve(mx, my - 3, 17, amp * 0.60f, LIP_LIGHT, 1);
+          draw_curve(mx, my + 1, 15, 0.0f, MOUTH_IN, 1);
+          return;
+        }
+
+        if (force_happy) {
+          draw_capsule(mx - 17, my - 4, 34, 8, LIP_DARK);
+          draw_curve(mx, my - 2, 16, 4.6f, LIP_DARK, 3);
+          draw_curve(mx, my - 3, 14, 2.4f, LIP_LIGHT, 1);
+          draw_curve(mx, my + 1, 11, 0.0f, MOUTH_IN, 1);
+          return;
+        }
+
+        if (force_sad) {
+          draw_capsule(mx - 15, my - 3, 30, 6, LIP_DARK);
+          draw_curve(mx, my + 4, 15, -4.2f, LIP_DARK, 3);
+          draw_curve(mx, my + 3, 13, -2.2f, LIP_LIGHT, 1);
+          return;
+        }
+
+        if (force_angry) {
+          draw_capsule(mx - 16, my - 4, 32, 7, LIP_DARK);
+          draw_curve(mx, my + 1, 14, -1.4f, LIP_DARK, 3);
+          draw_curve(mx, my, 12, -0.5f, LIP_LIGHT, 1);
+          return;
+        }
+
+        if (force_surprised) {
+          draw_capsule(mx - 10, my - 8, 20, 16, LIP_DARK);
+          draw_capsule(mx - 6, my - 5, 12, 10, MOUTH_IN);
+          filled_circle(mx - 2, my - 3, 1, LIP_LIGHT);
+          return;
+        }
+
+        float smile_boost = 0.0f;
+
+        if (phase == ${voice_assist_idle_phase_id}) {
+          uint32_t cycle = now % 14000UL;
+
+          if (cycle > 8200UL && cycle < 10800UL) {
+            float p = (cycle - 8200UL) / 2600.0f;
+            smile_boost =
+              (p < 0.5f)
+              ? smoothstep(p * 2.0f) * 4.0f
+              : smoothstep((1.0f - p) * 2.0f) * 4.0f;
+          }
+        }
+
+        float mouth_level = 0.0f;
+
+        if (!std::isnan(id(${playback_peak_sensor_id}).state)) {
+          float db = id(${playback_peak_sensor_id}).state;
+          mouth_level = clampf((db + 68.0f) / 45.0f, 0.0f, 1.0f);
+          if (db < -62.0f) mouth_level = 0.0f;
+        }
+
+        static float mouth_smooth = 0.0f;
+        mouth_smooth += (mouth_level > mouth_smooth ? 0.55f : 0.18f) * (mouth_level - mouth_smooth);
+
+        float mouth_anim = mouth_smooth;
+
+        if (mouth_anim > 0.05f) {
+          float syllable = 0.50f + 0.50f * ((sinf(now / 72.0f) + 1.0f) * 0.5f);
+          float phrase   = 0.72f + 0.28f * ((sinf(now / 210.0f + 1.4f) + 1.0f) * 0.5f);
+
+          uint32_t cc = now % 640UL;
+
+          float closure =
+            (cc < 70UL)  ? 0.10f :
+            (cc < 115UL) ? 0.35f :
+                            1.0f;
+
+          if ((now % 2300UL) > 2100UL) closure *= 0.25f;
+
+          mouth_anim = clampf(mouth_anim * syllable * phrase * closure, 0.0f, 1.0f);
+        }
+
+        const bool mouth_should_talk =
+            announcement_playing &&
+            phase == ${voice_assist_replying_phase_id} &&
+            !id(${timer_ringing_switch_id}).state &&
+            mouth_smooth > 0.05f;
+
+        if (mouth_should_talk) {
+          int mh = std::max(8, std::min(30, 8 + (int)(mouth_anim * 24.0f)));
+          int mw = std::max(28, std::min(46, 28 + (int)(mouth_anim * 18.0f)));
+
+          draw_capsule(mx - mw / 2, my - mh / 2, mw, mh, LIP_DARK);
+          draw_capsule(mx - (mw - 6) / 2, my - (mh - 5) / 2, mw - 6, mh - 5, MOUTH_IN);
+
+          if (mh >= 18) {
+            int tw = mw - 16;
+            int th = mh / 3 + 3;
+
+            draw_capsule(mx - tw / 2, my + mh / 7, tw, th, TONGUE);
+            draw_curve(mx, my + mh / 7 + 1, tw / 2 - 2, 1.0f, TONGUE_L, 1);
+          }
+
+          draw_curve(mx, my - mh / 2 + 3, mw / 2 - 5, 1.3f, LIP_LIGHT, 1);
+
+        } else if (phase == ${voice_assist_waiting_for_command_phase_id} ||
+                   phase == ${voice_assist_listening_for_command_phase_id}) {
+          draw_capsule(mx - 10, my - 7, 20, 14, LIP_DARK);
+          draw_capsule(mx - 6, my - 5, 12, 10, MOUTH_IN);
+          filled_circle(mx - 2, my - 2, 1, LIP_LIGHT);
+
+        } else if (phase == ${voice_assist_thinking_phase_id}) {
+          draw_capsule(mx - 15, my - 4, 30, 8, LIP_DARK);
+          draw_curve(mx + 2, my - 1, 14, 2.6f, LIP_DARK, 3);
+          draw_curve(mx + 2, my - 2, 12, 1.5f, LIP_LIGHT, 1);
+          draw_curve(mx, my + 1, 10, 0.0f, MOUTH_IN, 1);
+
+        } else if (phase == ${voice_assist_error_phase_id} ||
+                   phase == ${voice_assist_not_ready_phase_id}) {
+          draw_capsule(mx - 15, my - 3, 30, 6, LIP_DARK);
+          draw_curve(mx, my + 4, 15, -4.2f, LIP_DARK, 3);
+          draw_curve(mx, my + 3, 13, -2.2f, LIP_LIGHT, 1);
+
+        } else {
+          float amp = 2.2f + smile_boost;
+          int half_w = 16 + (smile_boost > 0.5f ? 1 : 0);
+
+          draw_capsule(mx - 16, my - 4, 32, 8, LIP_DARK);
+          draw_curve(mx, my - 1, half_w, amp, LIP_DARK, 3);
+          draw_curve(mx, my - 2, half_w - 1, amp * 0.55f, LIP_LIGHT, 1);
+          draw_curve(mx, my + 1, half_w - 3, 0.0f, MOUTH_IN, 1);
+        }
+      };
+
+      // =================================================================
+      // RENDER
+      // =================================================================
+      int startled_x = force_startled ? (int)(sinf(now / 24.0f) * 3.0f) : 0;
+      int startled_y = force_startled ? (int)(fabsf(sinf(now / 38.0f)) * -3.0f) : 0;
+
+      int face_ox = bob_x + dance_x + startled_x;
+      int face_oy = bob_y + dance_y + startled_y;
+
+      int left_cx  = 80  + face_ox;
+      int left_cy  = 110 + face_oy + dance_left_y;
+      int right_cx = 160 + face_ox;
+      int right_cy = 110 + face_oy + dance_right_y;
+
+      draw_eye(left_cx, left_cy, true);
+      draw_eye(right_cx, right_cy, false);
+      draw_mouth(120 + face_ox, 170 + face_oy);
+
+      if (music_mode) {
+        const int base_x[6]  = {28, 56, 96, 148, 184, 208};
+        const int drift_x[6] = {8, -6, 10, -8, 6, -5};
+
+        for (int i = 0; i < 6; i++) {
+          uint32_t local = (now + i * 530UL) % 3400UL;
+          float p = local / 3400.0f;
+
+          int x = base_x[i] + (int)(drift_x[i] * p) + dance_x / 2;
+          int y = 210 - (int)(p * 165.0f) + dance_y / 2;
+          int s = (i % 2) + 1;
+
+          Color nc = (p > 0.82f) ? Color(90, 255, 180) : Color(180, 255, 210);
+
+          if (y > 18 && y < 225) {
+            draw_music_note(x, y, s, nc);
+          }
+        }
+      }
+
+      if (police_mode) {
+        Color HAT_DARK  = Color(18, 35, 120);
+        Color HAT_LIGHT = Color(35, 70, 180);
+        Color BADGE     = Color(255, 210, 70);
+
+        filled_rectangle(78 + face_ox, 48 + face_oy, 84, 16, HAT_LIGHT);
+        filled_rectangle(92 + face_ox, 34 + face_oy, 56, 16, HAT_DARK);
+        filled_rectangle(66 + face_ox, 62 + face_oy, 108, 5, HAT_DARK);
+
+        filled_circle(120 + face_ox, 56 + face_oy, 7, BADGE);
+        filled_circle(120 + face_ox, 56 + face_oy, 3, HAT_DARK);
+      }
+
+      if (force_startled) {
+        Color ALERT = Color(255, 220, 80);
+
+        filled_rectangle(116 + face_ox, 38 + face_oy, 8, 24, ALERT);
+        filled_circle(120 + face_ox, 70 + face_oy, 5, ALERT);
+      }
+
+      if (effective_sleeping) {
+        draw_sleep_zzz();
+      }
+      draw_volume_bar();
+      draw_circular_spectrum(vu);
+      if (id(${fw_update_check_enabled_id}) && id(${fw_update_available_id})) {
+        filled_rectangle(52, 8, 136, 22, Color(255, 140, 0));
+        rectangle(52, 8, 136, 22, Color(120, 60, 0));
+
+        it.printf(
+          X(120),
+          Y(19),
+          id(${font_header_id}),
+          Color(255, 255, 255),
+          TextAlign::CENTER,
+          "Nuovo FW: %s",
+          id(${fw_latest_version_id}).c_str()
+        );
+      }
+
+# ======================================================
+# SENSORI
+# ======================================================
+select:
+  - platform: template
+    name: "Display - Emozione"
+    id: ${emotion_select_id}
+    optimistic: true
+    restore_value: true
+    options:
+      - "Auto"
+      - "Felice"
+      - "Assonnato"
+      - "Triste"
+      - "Arrabbiato"
+      - "Sorpreso"
+    initial_option: "Auto"
+    set_action:
+      - lambda: |-
+          if      (x == "Felice")      id(${display_emotion_mode_id}) = 1;
+          else if (x == "Assonnato")   id(${display_emotion_mode_id}) = 2;
+          else if (x == "Triste")      id(${display_emotion_mode_id}) = 3;
+          else if (x == "Arrabbiato")  id(${display_emotion_mode_id}) = 4;
+          else if (x == "Sorpreso")    id(${display_emotion_mode_id}) = 5;
+          else                         id(${display_emotion_mode_id}) = 0;
+          id(${display_awake_until_id}) = millis() + 300000UL;
+
+  - platform: template
+    name: "WakeWord - Sensibilita"
+    optimistic: true
+    initial_option: "Medio"
+    restore_value: true
+    entity_category: config
+    options:
+      - "Poco sensibile"
+      - "Medio"
+      - "Molto sensibile"
+    on_value:
+      lambda: |-
+        if (x == "Poco sensibile") {
+          id(${wake_word_okay_nabu_model_id}).set_probability_cutoff(217);
+        } else if (x == "Medio") {
+          id(${wake_word_okay_nabu_model_id}).set_probability_cutoff(176);
+        } else if (x == "Molto sensibile") {
+          id(${wake_word_okay_nabu_model_id}).set_probability_cutoff(50);
+        }
+
+  - platform: logger
+    id: ${logger_select_id}
+    name: "Livello log"
+    disabled_by_default: true
+
+  - platform: template
+    optimistic: true
+    name: "Sveglia - Azione"
+    id: ${alarm_action_select_id}
+    icon: mdi:bell-plus
+    options:
+      - "Riproduci suono"
+      - "Invia evento"
+      - "Suono ed evento"
+    initial_option: "Riproduci suono"
+    on_value:
+      then:
+        - lambda: |-
+            id(${saved_alarm_action_id}) = x;
+
+switch:
+  - platform: template
+    id: ${antifurto_switch_id}
+    name: "Modalità antifurto"
+    icon: mdi:shield-home
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    turn_on_action:
+      - lambda: |-
+          id(${display_awake_until_id}) = millis() + 300000UL;
+          id(${display_startled_until_id}) = 0;
+    turn_off_action:
+      - lambda: |-
+          id(${antifurto_alarm_in_corso_id}) = false;
+
+  - platform: template
+    id: ${va_continuous_mode_switch_id}
+    name: "Assistente - Ascolto continuo"
+    icon: mdi:headset
+    restore_mode: RESTORE_DEFAULT_ON
+    lambda: |-
+      return id(${va_modalita_continua_id});
+    turn_on_action:
+      - lambda: |-
+          id(${va_modalita_continua_id}) = true;
+      - logger.log:
+          level: INFO
+          format: "==== Modalita assistente: CONTINUA"
+    turn_off_action:
+      - lambda: |-
+          id(${va_modalita_continua_id}) = false;
+      - logger.log:
+          level: INFO
+          format: "==== Modalita assistente: SINGOLA"
+      - if:
+          condition:
+            voice_assistant.is_running:
+          then:
+            - voice_assistant.stop:
+
+  - platform: gpio
+    id: ${amp_enable_switch_id}
+    name: "Amplificatore"
+    icon: mdi:speaker
+    entity_category: config
+    pin:
+      number: ${amp_ctrl}
+      inverted: false
+    restore_mode: RESTORE_DEFAULT_ON
+
+  - platform: template
+    id: ${mic_mute_switch_id}
+    name: "Microfono disattivato"
+    icon: mdi:microphone-off
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    turn_on_action:
+      - voice_assistant.stop:
+      - micro_wake_word.stop:
+      - lambda: |-
+          id(${audio_adc_id}).set_mic_gain(0.0f);
+    turn_off_action:
+      - lambda: |-
+          id(${audio_adc_id}).set_mic_gain(id(${mic_gain_saved_id}));
+      - script.execute: ${script_ensure_wake_word_running_id}
+
+  - platform: template
+    id: ${mute_sound_switch_id}
+    name: "Suono Mute-Unmute"
+    icon: "mdi:bullhorn"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+
+  - platform: template
+    id: ${wake_sound_switch_id}
+    name: "Suono Wake Word"
+    icon: "mdi:bullhorn"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+
+  - platform: template
+    id: ${timer_ringing_switch_id}
+    optimistic: true
+    internal: true
+    restore_mode: ALWAYS_OFF
+
+    on_turn_off:
+      - micro_wake_word.disable_model: ${wake_word_stop_model_id}
+      - script.execute: ${script_disable_repeat_id}
+
+      - if:
+          condition:
+            media_player.is_announcing:
+              id: ${media_player_id}
+          then:
+            - media_player.stop:
+                id: ${media_player_id}
+                announcement: true
+
+      - mixer_speaker.apply_ducking:
+          id: ${media_mixer_input_id}
+          decibel_reduction: 0
+          duration: 1.0s
+
+    on_turn_on:
+      - mixer_speaker.apply_ducking:
+          id: ${media_mixer_input_id}
+          decibel_reduction: 10
+          duration: 0s
+
+      - micro_wake_word.enable_model: ${wake_word_stop_model_id}
+      - script.execute: ${script_ring_timer_id}
+
+      - delay: 15min
+      - switch.turn_off: ${timer_ringing_switch_id}
+
+  - platform: template
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    id: ${alarm_on_switch_id}
+    icon: mdi:bell-badge
+    name: "Sveglia attiva"
+
+  - platform: template
+    id: ${fw_update_check_switch_id}
+    name: "Controllo nuovo firmware"
+    icon: mdi:update
+    restore_mode: RESTORE_DEFAULT_ON
+    lambda: |-
+      return id(${fw_update_check_enabled_id});
+    turn_on_action:
+      - lambda: |-
+          id(${fw_update_check_enabled_id}) = true;
+      - script.execute: ${script_check_firmware_version_id}
+    turn_off_action:
+      - lambda: |-
+          id(${fw_update_check_enabled_id}) = false;
+          id(${fw_update_available_id}) = false;
+          id(${fw_latest_version_id}) = "unknown";
+
+number:
+  - platform: template
+    id: ${noise_threshold_number_id}
+    name: "Soglia Rumore"
+    icon: mdi:waveform
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    min_value: -75
+    max_value: -25
+    step: 1
+    initial_value: -55
+    mode: slider
+
+  - platform: template
+    id: ${mic_gain_number_id}
+    name: "Mic-Guadagno"
+    icon: mdi:microphone
+    entity_category: config
+    min_value: 0
+    max_value: 42
+    step: 1
+    restore_value: true
+    initial_value: 24
+    set_action:
+      - lambda: |-
+          id(${mic_gain_saved_id}) = x;
+          if (!id(${mic_mute_switch_id}).state) {
+            id(${audio_adc_id}).set_mic_gain(x);
+          }
+      - logger.log:
+          format: "[MIC] Set ES7210 gain to %.0f dB"
+          args: ["x"]
+
+  - platform: template
+    id: ${va_gain_factor_number_id}
+    name: "VA-Guadagno"
+    icon: mdi:microphone
+    entity_category: config
+    min_value: 1
+    max_value: 64
+    step: 1
+    restore_value: true
+    initial_value: 32
+    set_action:
+      - lambda: |-
+          id(${va_microphone_id}).set_gain_factor(x);
+      - logger.log:
+          format: "[MIC] Set gain factor to %.0f"
+          args: ["x"]
+
+  - platform: template
+    id: ${va_noise_suppression_number_id}
+    name: "Sopp. Rumore"
+    icon: mdi:waveform
+    entity_category: config
+    min_value: 0
+    max_value: 4
+    step: 1
+    restore_value: true
+    initial_value: 4
+    set_action:
+      - lambda: |-
+          id(${voice_assistant_id}).set_noise_suppression_level(x);
+      - logger.log:
+          format: "[MIC] Set suppression to %.0f"
+          args: ["x"]
+
+sensor:
+  - platform: template
+    id: ${ambient_noise_sensor_id}
+    icon: mdi:microphone
+    unit_of_measurement: dB
+    accuracy_decimals: 1
+    update_interval: 200ms
+    internal: true
+    lambda: |-
+      if (std::isnan(id(${playback_peak_sensor_id}).state)) return NAN;
+      return id(${playback_peak_sensor_id}).state;
+
+  - platform: sound_level
+    id: ${playback_meter_sensor_id}
+    microphone:
+      microphone: ${microphone_id}
+      channels: [0]
+    passive: false
+    measurement_duration: 150ms
+    rms:
+      id: ${playback_rms_sensor_id}
+      internal: true
+    peak:
+      id: ${playback_peak_sensor_id}
+      internal: true
+
+  - platform: template
+    id: ${next_timer_sensor_id}
+    name: "Prossimo timer"
+    update_interval: never
+    disabled_by_default: true
+    device_class: duration
+    unit_of_measurement: s
+    icon: "mdi:timer"
+    accuracy_decimals: 0
+  # ----------------------------------------------------
+  # BATTERY VOLTAGE
+  # ----------------------------------------------------
+  - platform: adc
+    id: battery_adc_raw
+    name: "${friendly} Battery ADC Raw"
+    pin: ${battery_adc_pin}
+    attenuation: 12db
+    update_interval: 10s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+    filters:
+      - median:
+          window_size: 7
+          send_every: 3
+          send_first_at: 1
+
+  - platform: template
+    id: battery_voltage
+    name: "${friendly} Battery Voltage"
+    unit_of_measurement: "V"
+    device_class: voltage
+    state_class: measurement
+    accuracy_decimals: 2
+    update_interval: 10s
+    lambda: |-
+      if (isnan(id(battery_adc_raw).state)) return NAN;
+      return id(battery_adc_raw).state * 3.0f;
+
+  # ----------------------------------------------------
+  # BATTERY PERCENTAGE
+  # ----------------------------------------------------
+  - platform: template
+    id: battery_percent
+    name: "${friendly} Battery"
+    unit_of_measurement: "%"
+    device_class: battery
+    state_class: measurement
+    accuracy_decimals: 0
+    update_interval: 30s
+    lambda: |-
+      if (isnan(id(battery_voltage).state)) return NAN;
+
+      float v = id(battery_voltage).state;
+
+      // LiPo 1S semplice:
+      // 3.20V = 0%
+      // 4.20V = 100%
+      float pct = (v - 3.20f) * 100.0f / (4.20f - 3.20f);
+
+      if (pct < 0.0f) pct = 0.0f;
+      if (pct > 100.0f) pct = 100.0f;
+
+      return pct;
+
+  - platform: template
+    id: companion_ble_rssi_stable
+    name: "${friendly} RSSI altro Voice Assistant"
+    unit_of_measurement: "dBm"
+    accuracy_decimals: 0
+    update_interval: 2s
+    lambda: |-
+      if (id(companion_ble_seen_once) && (millis() - id(companion_ble_last_seen_ms) < 30000)) {
+        return id(companion_ble_last_rssi);
+      }
+      return {};
+
+text_sensor:
+  - platform: template
+    id: ${next_timer_name_sensor_id}
+    name: "Prossimo timer - Nome"
+    icon: "mdi:timer"
+    disabled_by_default: true
+
+  - platform: template
+    name: "Ora sveglia"
+    id: ${alarm_time_text_id}
+    icon: mdi:bell-ring
+
+  - platform: template
+    name: "Ora dispositivo"
+    id: ${current_time_text_id}
+    icon: mdi:clock
+
+button:
+  - platform: template
+    name: "Test antifurto"
+    icon: mdi:alarm-light
+    on_press:
+      - script.execute: ${script_antifurto_trigger_id}
+
+  - platform: factory_reset
+    id: ${factory_reset_button_id}
+    name: "Ripristino di fabbrica"
+    entity_category: diagnostic
+    internal: true
+
+  - platform: restart
+    id: ${restart_button_id}
+    name: "Riavvia"
+    entity_category: diagnostic
+    disabled_by_default: true
+    icon: "mdi:restart"
+
+  - platform: template
+    name: "Controlla nuovo firmware"
+    icon: mdi:update
+    on_press:
+      - script.execute: ${script_check_firmware_version_id}
+      
+binary_sensor:
+  - platform: ble_presence
+    id: companion_ble_presence
+    name: "${friendly} Companion BLE Presente"
+    ibeacon_uuid: ${ble_sync_uuid}
+    ibeacon_major: ${ble_sync_major}
+    ibeacon_minor: ${ble_peer_minor}
+    min_rssi: -82dB
+    timeout: 30s
+    filters:
+      - delayed_on: 2s
+      - delayed_off: 10s
+
+    on_press:
+      then:
+        - logger.log:
+            level: INFO
+            tag: ble_sync
+            format: "==== BLE SYNC: Companion VICINO"
+
+    on_release:
+      then:
+        - logger.log:
+            level: INFO
+            tag: ble_sync
+            format: "==== BLE SYNC: Companion LONTANO"
+
+  - platform: template
+    id: ${noise_detected_binary_sensor_id}
+    name: "Rilevamento rumore"
+    lambda: |-
+      if (std::isnan(id(${playback_peak_sensor_id}).state)) return false;
+
+      // Evita auto-trigger mentre il device sta già suonando/parlando
+      if (id(${antifurto_alarm_in_corso_id})) return false;
+
+      const auto s = id(${media_player_id}).state;
+      if (s == media_player::MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING ||
+          s == media_player::MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING ||
+          id(${timer_ringing_switch_id}).state) {
+        return false;
+      }
+
+      return id(${playback_peak_sensor_id}).state > id(${noise_threshold_number_id}).state;
+    filters:
+      - delayed_on: 150ms
+      - delayed_off: 1200ms
+    on_press:
+      - if:
+          condition:
+            switch.is_on: ${antifurto_switch_id}
+          then:
+            - script.execute: ${script_antifurto_trigger_id}
