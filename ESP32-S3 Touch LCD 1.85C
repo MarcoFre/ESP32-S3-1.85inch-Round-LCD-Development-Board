@@ -970,7 +970,7 @@ esphome:
     board_build.f_flash: 80000000L
     board_build.f_cpu: 240000000L
   project:
-    name: Waveshare HackMyHome_DisplayTest
+    name: Waveshare.HackMyHome
     version: ${fw_version}
 
   on_boot:
